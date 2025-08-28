@@ -121,6 +121,10 @@ GoogleService-Info.plist
 build/
 DerivedData/
 
+# Large binary files - commented out to include everything
+# *.pkg
+# *.framework/
+
 # User-specific files
 *.xcuserstate
 *.xcuserdatad/
