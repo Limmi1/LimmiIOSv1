@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "skill-icons_instagram.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
