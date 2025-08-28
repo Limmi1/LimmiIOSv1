@@ -65,7 +65,7 @@ struct RuleCard: View {
                     
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.tertiary)
+                        .foregroundColor(.secondary)
                 }
                 
                 // Rule Info
