@@ -17,12 +17,12 @@ struct RuleCard: View {
         Button(action: {
             showingEditView = true
         }) {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 16) {
                 // Rule Header
                 HStack {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(rule.name)
-                            .font(.headline)
+                            .font(.title3)
                             .fontWeight(.semibold)
                             .foregroundColor(.primary)
                         
@@ -65,7 +65,7 @@ struct RuleCard: View {
                     
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.tertiary)
                 }
                 
                 // Rule Info
@@ -121,7 +121,8 @@ struct RuleCard: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(20)
+            .frame(minHeight: 80)
             .background(Color(.systemBackground))
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)

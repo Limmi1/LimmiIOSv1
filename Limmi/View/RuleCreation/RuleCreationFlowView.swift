@@ -244,6 +244,14 @@ struct ProgressHeaderView: View {
     
     var body: some View {
         VStack(spacing: 16) {
+            // Step counter
+            HStack {
+                Text("Step \(currentStep.rawValue + 1) of \(RuleCreationStep.allCases.count)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+            }
+            
             // Progress Indicator
             HStack(spacing: 8) {
                 ForEach(RuleCreationStep.allCases, id: \.rawValue) { step in

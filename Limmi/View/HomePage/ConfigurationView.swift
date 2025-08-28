@@ -57,18 +57,17 @@ struct ConfigurationView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
-                    /*Section(header: Text("App Settings")) {
+                    
+                    Section(header: Text("Protection")) {
                         HStack {
-                            Image(systemName: "gear")
+                            Image(systemName: "shield.lefthalf.filled")
                                 .foregroundColor(.blue)
                             Text("Blocking Engine Status")
                             Spacer()
                             Text(blockingEngineViewModel.isActive ? "Active" : "Inactive")
                                 .foregroundColor(blockingEngineViewModel.isActive ? .green : .gray)
                         }
-                    }*/
-                    
-                    Section(header: Text("Rule Processing Strategy")) {
+                        
                         VStack(alignment: .leading, spacing: 12) {
                             Picker("Strategy Type", selection: $appSettings.ruleProcessingStrategy) {
                                 ForEach(RuleProcessingStrategyType.allCases) { strategy in
@@ -81,30 +80,18 @@ struct ConfigurationView: View {
                             Text(appSettings.ruleProcessingStrategy.description)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            
-                            /*if !appSettings.ruleProcessingStrategy.recommendedFor.isEmpty {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Recommended for:")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.secondary)
-                                    
-                                    ForEach(appSettings.ruleProcessingStrategy.recommendedFor, id: \.self) { useCase in
-                                        HStack {
-                                            Image(systemName: "circle.fill")
-                                                .font(.system(size: 4))
-                                                .foregroundColor(.secondary)
-                                            Text(useCase)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                            }*/
                         }
-                        .padding(.vertical, 4)
                         
+                        HStack {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.blue)
+                            Text("This setting affects how rules are processed and can impact performance.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
+                    
+                    // Rule Processing Strategy moved to Protection section above
                     /*
                     Section(header: Text("Advanced Settings")) {
                         Toggle(isOn: $appSettings.enableDetailedLogging) {

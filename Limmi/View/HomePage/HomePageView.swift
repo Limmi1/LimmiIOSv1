@@ -68,29 +68,30 @@ struct HomePageViewContent: View {
                 VStack(spacing: 0) {
                     // Header
                     VStack(spacing: 16) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Limmi")
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                Text("Smart App Blocking")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Limmi")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
                             
-                            Spacer()
-                            
-                            // Status indicator
-                            HStack(spacing: 8) {
-                                Circle()
-                                    .fill(blockingEngineViewModel.isActive ? .green : .gray)
-                                    .frame(width: 8, height: 8)
+                            HStack(spacing: 12) {
+                                HStack(spacing: 6) {
+                                    Circle()
+                                        .fill(blockingEngineViewModel.isActive ? .green : .gray)
+                                        .frame(width: 6, height: 6)
+                                    Text(blockingEngineViewModel.isActive ? "Protection Active" : "Protection Inactive")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
                                 
-                                Text(blockingEngineViewModel.isActive ? "Active" : "Inactive")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                Spacer()
+                                
+                                Button("Create Rule") {
+                                    // Trigger rule creation
+                                    NotificationCenter.default.post(name: .didModifyRules, object: nil)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .controlSize(.small)
+                                .fontWeight(.semibold)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -119,7 +120,7 @@ struct HomePageViewContent: View {
                                             .lineLimit(3)
                                     }
                                     
-                                    CreateRuleButton()
+                                    // Create Rule Button moved to header
                                 }
                                 .padding(.horizontal, 32)
                                 .padding(.vertical, 40)
@@ -131,11 +132,7 @@ struct HomePageViewContent: View {
                                     }
                                 }
                                 .padding(.horizontal, 16)
-                                
-                                // Add Rule Button for existing rules
-                                CreateRuleButton()
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 8)
+                                .padding(.top, 8)
                             }
                         }
                         

@@ -20,27 +20,37 @@ struct LoginView: View {
     var body: some View {
         ZStack {
             Color(.systemGroupedBackground).ignoresSafeArea()
-            VStack(spacing: 32) {
+            VStack(spacing: 40) {
                 Spacer()
                 // Logo or App Name
-                VStack(spacing: 8) {
+                VStack(spacing: 16) {
                     Image(systemName: "lock.shield")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 64, height: 64)
+                        .frame(width: 80, height: 80)
                         .foregroundColor(.accentColor)
-                    Text("Welcome to Limmi")
-                        .font(.title)
-                        .fontWeight(.bold)
-                }
-                // Mode Picker
-                Picker("Mode", selection: $mode) {
-                    ForEach(AuthMode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
+                    
+                    VStack(spacing: 8) {
+                        Text("Welcome to Limmi")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                        
+                        Text("Digital Wellness & Protection")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding(.horizontal)
+                
+                // Mode Picker
+                VStack(spacing: 16) {
+                    Picker("Mode", selection: $mode) {
+                        ForEach(AuthMode.allCases) { mode in
+                            Text(mode.rawValue).tag(mode)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding(.horizontal, 32)
+                }
                 // Input Fields
                 VStack(spacing: 16) {
                     TextField("Email", text: $email)
