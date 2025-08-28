@@ -123,14 +123,8 @@ struct RuleCreationFlowView: View {
     private func moveToNextStep() {
         hideKeyboard()
         withAnimation(.easeInOut(duration: 0.3)) {
-            // Smart navigation: skip beacon step if no beacon is selected
-            if currentStep == .name && selectedBeacon == nil {
-                currentStep = .location
-            } else if currentStep == .beacon && selectedBeacon == nil {
-                currentStep = .location
-            } else {
-                currentStep = currentStep.next
-            }
+            // Normal step progression - let users go through all steps
+            currentStep = currentStep.next
         }
     }
     
