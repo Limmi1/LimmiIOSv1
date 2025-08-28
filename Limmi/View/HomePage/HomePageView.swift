@@ -44,6 +44,7 @@ struct HomePageViewContent: View {
     @Binding var logTapCount: Int
     @Binding var showLogSheet: Bool
     @State private var showingBugReport = false
+    @State private var showingRuleCreation = false
     
     // Explicit initializer for all properties
     init(
@@ -86,8 +87,7 @@ struct HomePageViewContent: View {
                                 Spacer()
                                 
                                 Button("Create Rule") {
-                                    // Trigger rule creation
-                                    NotificationCenter.default.post(name: .didModifyRules, object: nil)
+                                    showingRuleCreation = true
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .controlSize(.small)
@@ -155,6 +155,12 @@ struct HomePageViewContent: View {
                 Text("Settings")
             }
             .tag(1)
+        }
+        .sheet(isPresented: $showingRuleCreation,
+               onDismiss: { NotificationCenter.default.post(name: .didModifyRules, object: nil) }) {
+            RuleCreationFlowView(authViewModel: authViewModel)
+                .environmentObject(authViewModel)
+                .environmentObject(ruleStoreViewModel)
         }
         .tint(appColor.buttonColor)
         .onAppear {
