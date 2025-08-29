@@ -199,31 +199,25 @@ struct GPSLocationStepView: View {
     
     private var mapAnnotations: [LocationAnnotation] {
         guard gpsLocation.isActive else { return [] }
-        return [LocationAnnotation(coordinate: CLLocationCoordinate2D(latitude: gpsLocation.latitude, longitude: gpsLocation.longitude))]
+        // Create a stable annotation to prevent flickering
+        let annotation = LocationAnnotation(coordinate: CLLocationCoordinate2D(latitude: gpsLocation.latitude, longitude: gpsLocation.longitude))
+        return [annotation]
     }
     
-    // Computed properties for radius circle visualization
+    // Fixed properties for radius circle visualization to prevent flickering
     private var radiusCircleSize: CGFloat {
-        // Convert radius from meters to visual size on map
-        // Scale based on the map's current zoom level (span)
-        let metersPerPixel = region.span.latitudeDelta * 111000.0 / 300.0 // Approximate meters per pixel
-        let radiusInPixels = CGFloat(gpsLocation.radius) / metersPerPixel
-        return max(20, min(200, radiusInPixels))
+        // Use a fixed size for the radius circle to prevent flickering
+        return 100
     }
     
     private var radiusCircleCenterPosition: CGPoint {
-        // Position the circle at the center of the map view (where the pin is)
-        // This ensures the circle is always centered on the pin location
-        let mapHeight = max(200, min(300, UIScreen.main.bounds.height * 0.35))
-        
-        // The circle should be centered on the map view since the map is centered on the GPS coordinates
-        return CGPoint(x: UIScreen.main.bounds.width / 2, y: mapHeight / 2)
+        // Use a fixed center position to prevent flickering
+        return CGPoint(x: 187.5, y: 150) // Fixed center position for the map
     }
     
     private func circleSize(for radius: Double) -> CGFloat {
-        // Scale the visual radius based on map zoom level
-        // This is a simplified calculation - a more sophisticated approach would consider the actual map scale
-        return max(20, min(100, CGFloat(radius) / 10))
+        // Use a fixed size to prevent flickering
+        return 100
     }
     
     private func setupLocation() {
@@ -360,9 +354,14 @@ struct GPSLocationStepView: View {
 }
 
 // Helper struct for map annotations
-private struct LocationAnnotation: Identifiable {
+private struct LocationAnnotation: Identifiable, Equatable {
     let id = UUID()
     let coordinate: CLLocationCoordinate2D
+    
+    static func == (lhs: LocationAnnotation, rhs: LocationAnnotation) -> Bool {
+        return lhs.coordinate.latitude == rhs.coordinate.latitude && 
+               lhs.coordinate.longitude == rhs.coordinate.longitude
+    }
 }
 
 #if DEBUG
