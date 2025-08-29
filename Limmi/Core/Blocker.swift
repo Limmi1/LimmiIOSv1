@@ -335,10 +335,11 @@ final class ScreenTimeBlocker: Blocker {
         }
         
         // Apply blocking via CoreBlockingUtility
-        coreBlockingUtility.applyBlocking(
-            apps: currentBlockedApplicationTokens,
+        // Use setCompleteBlockingState to ensure all blocking types are set explicitly
+        coreBlockingUtility.setCompleteBlockingState(
+            applications: currentBlockedApplicationTokens,
             webDomains: currentBlockedWebDomainTokens,
-            categories: currentBlockedActivityCategoryTokens
+            activityCategories: currentBlockedActivityCategoryTokens
         )
         
         updateStateSubject()
@@ -352,7 +353,12 @@ final class ScreenTimeBlocker: Blocker {
         }
         
         currentBlockedApplicationTokens.formUnion(tokens)
-        coreBlockingUtility.applyBlocking(apps: currentBlockedApplicationTokens)
+        // Use setCompleteBlockingState to ensure all blocking types are set explicitly
+        coreBlockingUtility.setCompleteBlockingState(
+            applications: currentBlockedApplicationTokens,
+            webDomains: currentBlockedWebDomainTokens,
+            activityCategories: currentBlockedActivityCategoryTokens
+        )
         updateStateSubject()
     }
     
@@ -364,7 +370,12 @@ final class ScreenTimeBlocker: Blocker {
         }
         
         currentBlockedWebDomainTokens.formUnion(tokens)
-        coreBlockingUtility.applyBlocking(webDomains: currentBlockedWebDomainTokens)
+        // Use setCompleteBlockingState to ensure all blocking types are set explicitly
+        coreBlockingUtility.setCompleteBlockingState(
+            applications: currentBlockedApplicationTokens,
+            webDomains: currentBlockedWebDomainTokens,
+            activityCategories: currentBlockedActivityCategoryTokens
+        )
         updateStateSubject()
     }
     
@@ -406,10 +417,11 @@ final class ScreenTimeBlocker: Blocker {
         }
         
         // Apply updated blocking state via CoreBlockingUtility
-        coreBlockingUtility.applyBlocking(
-            apps: currentBlockedApplicationTokens,
+        // Use setCompleteBlockingState to ensure all blocking types are set explicitly
+        coreBlockingUtility.setCompleteBlockingState(
+            applications: currentBlockedApplicationTokens,
             webDomains: currentBlockedWebDomainTokens,
-            categories: currentBlockedActivityCategoryTokens
+            activityCategories: currentBlockedActivityCategoryTokens
         )
         
         updateStateSubject()
@@ -420,7 +432,12 @@ final class ScreenTimeBlocker: Blocker {
         currentBlockedWebDomainTokens.removeAll()
         currentBlockedActivityCategoryTokens.removeAll()
         
-        coreBlockingUtility.clearAllBlocking()
+        // Use setCompleteBlockingState to ensure all blocking is cleared
+        coreBlockingUtility.setCompleteBlockingState(
+            applications: [],
+            webDomains: [],
+            activityCategories: []
+        )
         
         updateStateSubject()
     }

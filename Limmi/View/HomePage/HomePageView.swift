@@ -66,80 +66,97 @@ struct HomePageViewContent: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                VStack(spacing: 0) {
-                    // Header
-                    VStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Limmi")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                            
-                            HStack(spacing: 12) {
-                                HStack(spacing: 6) {
-                                    Circle()
-                                        .fill(blockingEngineViewModel.isActive ? .green : .gray)
-                                        .frame(width: 6, height: 6)
-                                    Text(blockingEngineViewModel.isActive ? "Protection Active" : "Protection Inactive")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                
-                                Spacer()
-                                
-                                Button("Create Rule") {
-                                    showingRuleCreation = true
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .controlSize(.small)
-                                .fontWeight(.semibold)
+                List {
+                    // Protection Status Section
+                    Section {
+                        HStack(spacing: 12) {
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(blockingEngineViewModel.isActive ? .green : .gray)
+                                    .frame(width: 8, height: 8)
+                                Text(blockingEngineViewModel.isActive ? "Protection Active" : "Protection Inactive")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(blockingEngineViewModel.isActive ? .green : .secondary)
                             }
+                            
+                            Spacer()
+                            
+                            Text("\(ruleStoreViewModel.activeRules.count) rule\(ruleStoreViewModel.activeRules.count == 1 ? "" : "s")")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color(.systemGray6))
+                                )
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 8)
+                        .padding(.vertical, 4)
+                    } header: {
+                        Text("Status")
+                    } footer: {
+                        Text("Limmi monitors your location and blocks apps based on your rules")
                     }
                     
-                    // Rules Content
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            if $ruleStoreViewModel.activeRules.isEmpty {
-                                // Empty State - Only shown when data has actually loaded
-                                VStack(spacing: 20) {
-                                    Image(systemName: "shield.lefthalf.filled")
-                                        .font(.system(size: 64))
-                                        .foregroundColor(.blue.opacity(0.6))
+                    // Rules Section
+                    if ruleStoreViewModel.activeRules.isEmpty {
+                        Section {
+                            VStack(spacing: 20) {
+                                Image(systemName: "shield.lefthalf.filled")
+                                    .font(.system(size: 64))
+                                    .foregroundColor(.blue)
+                                
+                                VStack(spacing: 8) {
+                                    Text("No Rules Yet")
+                                        .font(.title2)
+                                        .fontWeight(.semibold)
                                     
-                                    VStack(spacing: 8) {
-                                        Text("No Rules Yet")
-                                            .font(.title2)
-                                            .fontWeight(.semibold)
-                                        
-                                        Text("Create your first rule to start blocking apps based on location and time")
-                                            .font(.body)
-                                            .foregroundColor(.secondary)
-                                            .multilineTextAlignment(.center)
-                                            .lineLimit(3)
-                                    }
-                                    
-                                    // Create Rule Button moved to header
+                                    Text("Create your first rule to start blocking apps based on location and time")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(3)
                                 }
-                                .padding(.horizontal, 32)
-                                .padding(.vertical, 40)
-                            } else {
-                                // Rules List
-                                LazyVStack(spacing: 12) {
-                                    ForEach(ruleStoreViewModel.activeRules) { rule in
-                                        RuleCard(rule: rule)
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.top, 8)
                             }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 40)
+                        } header: {
+                            Text("Rules")
                         }
-                        
-                        Spacer(minLength: 20)
+                    } else {
+                        Section {
+                            ForEach(ruleStoreViewModel.activeRules) { rule in
+                                RuleCard(rule: rule)
+                                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                    .listRowSeparator(.hidden)
+                            }
+                        } header: {
+                            Text("Active Rules")
+                        } footer: {
+                            Text("Tap any rule to edit or manage it")
+                        }
                     }
                 }
-                .background(Color(.systemGroupedBackground))
+                .listStyle(.insetGrouped)
+                .refreshable {
+                    // Pull-to-refresh functionality
+                    blockingEngineViewModel.refreshRules()
+                }
+                .navigationTitle("Limmi")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            showingRuleCreation = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    }
+                }
             }
             .tabItem {
                 Image(systemName: "shield.lefthalf.filled")
