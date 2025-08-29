@@ -54,20 +54,18 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     private func createDefaultLimmiShieldConfiguration() -> ShieldConfiguration {
         // Try to get the app icon from main app bundle, fallback to system icon
         let logoImage = getLimmiLogo()
-        // P3 color space provides wider gamut for more vibrant colors
-        let backgroundColor = UIColor(displayP3Red: 1.0, green: 0.95, blue: 0.0, alpha: 0.15)
+        
+        // Use the most vibrant yellow possible with higher alpha for maximum visibility
+        let vibrantYellowBackground = UIColor(displayP3Red: 1.0, green: 1.0, blue: 0.0, alpha: 0.25)
         print("🎨 [Shield] Creating default shield with logo: \(logoImage != nil ? "Found" : "Not found")")
-        print("🎨 [Shield] Background color: P3 Intense Yellow (alpha: 0.15)")
+        print("🎨 [Shield] Background color: Maximum Vibrant Yellow (alpha: 0.25)")
         print("🎨 [Shield] Button text: OK")
         
         // Create custom shield configuration with Limmi branding
-        // Use P3 color space for vibrant golden yellow with controlled alpha
-        // P3 provides wider color gamut than sRGB, allowing for more vibrant yellows
-        // Lower alpha (0.15) and higher green (0.95) for more intense yellow appearance
-        let vibrantGoldenYellow = UIColor(displayP3Red: 1.0, green: 0.95, blue: 0.0, alpha: 0.15)
+        // Use maximum vibrant yellow background for all shield screens
         return ShieldConfiguration(
             backgroundBlurStyle: .systemUltraThinMaterial, // Minimal blur to preserve color vibrancy
-            backgroundColor: vibrantGoldenYellow, // P3 intense yellow with controlled alpha
+            backgroundColor: vibrantYellowBackground, // Maximum vibrant yellow background
             icon: logoImage,
             title: ShieldConfiguration.Label(
                 text: "Limmi",
@@ -89,21 +87,18 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     private func createLocationVerificationShieldConfiguration() -> ShieldConfiguration {
         // Get the app icon
         let logoImage = getLimmiLogo()
-        // P3 color space provides wider gamut for more vibrant colors
-        let backgroundColor = UIColor(displayP3Red: 1.0, green: 0.95, blue: 0.0, alpha: 0.15)
+        
+        // Use the most vibrant yellow possible with higher alpha for maximum visibility
+        let vibrantYellowBackground = UIColor(displayP3Red: 1.0, green: 1.0, blue: 0.0, alpha: 0.25)
         print("🎨 [Shield] Creating location verification shield with logo: \(logoImage != nil ? "Found" : "Not found")")
-        print("🎨 [Shield] Background color: P3 Intense Yellow (alpha: 0.15)")
+        print("🎨 [Shield] Background color: Maximum Vibrant Yellow (alpha: 0.25)")
         print("🎨 [Shield] Button text: OK")
         
         // Create custom shield configuration for location verification
-        
-        // Use P3 color space for vibrant golden yellow with controlled alpha
-        // P3 provides wider color gamut than sRGB, allowing for more vibrant yellows
-        // Lower alpha (0.15) and higher green (0.95) for more intense yellow appearance
-        let vibrantGoldenYellow = UIColor(displayP3Red: 1.0, green: 0.95, blue: 0.0, alpha: 0.15)
+        // Use maximum vibrant yellow background for all shield screens
         return ShieldConfiguration(
             backgroundBlurStyle: .systemUltraThinMaterial, // Minimal blur to preserve color vibrancy
-            backgroundColor: vibrantGoldenYellow, // P3 intense yellow with controlled alpha
+            backgroundColor: vibrantYellowBackground, // Maximum vibrant yellow background
             icon: logoImage,
             title: ShieldConfiguration.Label(
                 text: "Limmi",
@@ -178,7 +173,7 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     }
     
     private func getLimmiLogo() -> UIImage? {
-        print("🔍 [Shield] Looking for BlackLimmiBrainLogo...")
+        print("🔍 [Shield] Looking for yellowbrainblacklinedots copy...")
         
         // List all available image names in the bundle for debugging
         let bundle = Bundle(for: ShieldConfigurationExtension.self)
@@ -192,8 +187,8 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
             }
         }
         
-        // Try multiple possible image names
-        let possibleNames = ["BlackLimmiBrainLogo", "BlackLimmiBrainLogo.png", "BlackLimmiBrainLogo.jpg", "LimmiBrainLogo", "LimmiBrainLogo.png", "LimmiBrainLogo.jpg"]
+        // Try multiple possible image names for the yellow brain logo with dots
+        let possibleNames = ["yellowbrainblacklinedots copy", "yellowbrainblacklinedots copy.png", "yellowbrainblacklinedots copy.jpg", "yellowbrainblacklinedots", "yellowbrainblacklinedots.png", "yellowbrainblacklinedots.jpg"]
         
         for imageName in possibleNames {
             print("🔍 [Shield] Trying image name: \(imageName)")
@@ -218,7 +213,30 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
             }
         }
         
-        print("❌ [Shield] Logo not found, using fallback icons")
+        print("❌ [Shield] Yellow brain logo not found, trying BlackLimmiBrainLogo as fallback...")
+        
+        // Fallback to the original BlackLimmiBrainLogo if yellow brain logo not found
+        let fallbackNames = ["BlackLimmiBrainLogo", "BlackLimmiBrainLogo.png", "BlackLimmiBrainLogo.jpg"]
+        
+        for imageName in fallbackNames {
+            if let brainLogo = UIImage(named: imageName) {
+                print("✅ [Shield] Found fallback logo '\(imageName)'")
+                return brainLogo
+            }
+            
+            if let brainLogo = UIImage(named: imageName, in: Bundle(for: ShieldConfigurationExtension.self), compatibleWith: nil) {
+                print("✅ [Shield] Found fallback logo '\(imageName)' in extension bundle")
+                return brainLogo
+            }
+            
+            if let mainBundle = Bundle(identifier: "com.ah.limmi"),
+               let brainLogo = UIImage(named: imageName, in: mainBundle, compatibleWith: nil) {
+                print("✅ [Shield] Found fallback logo '\(imageName)' in main app bundle")
+                return brainLogo
+            }
+        }
+        
+        print("❌ [Shield] No logos found, using system icon fallback")
         
         // Fallback to a system icon that represents the brain/thinking
         if let systemIcon = UIImage(systemName: "brain.head.profile") {
