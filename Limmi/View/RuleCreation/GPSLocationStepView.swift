@@ -28,6 +28,18 @@ struct GPSLocationStepView: View {
                 VStack(spacing: 16) {
                     // Location Status and Controls
                     VStack(spacing: 12) {
+                        // Auto-location message
+                        if !gpsLocation.isActive && locationProvider.authorizationStatus == .notDetermined {
+                            HStack {
+                                Image(systemName: "info.circle")
+                                    .foregroundColor(.blue)
+                                Text("Your current location will be automatically set once you grant location permission")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.leading)
+                            }
+                        }
+                        
                         if isLocationLoading {
                             HStack {
                                 ProgressView()
@@ -52,6 +64,10 @@ struct GPSLocationStepView: View {
                                 Text("Lat: \(gpsLocation.latitude, specifier: "%.5f"), Lng: \(gpsLocation.longitude, specifier: "%.5f")")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                Text("Location is fixed at your current position")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
                             }
                         }
                         
@@ -59,7 +75,7 @@ struct GPSLocationStepView: View {
                         Button(action: setCurrentLocation) {
                             HStack {
                                 Image(systemName: "location.circle.fill")
-                                Text("Use Current Location")
+                                Text(gpsLocation.isActive ? "Refresh Current Location" : "Set Current Location")
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -77,13 +93,21 @@ struct GPSLocationStepView: View {
                         Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: mapAnnotations) { annotation in
                             MapPin(coordinate: annotation.coordinate, tint: .blue)
                         }
+                        .overlay(
+                            // Radius circle overlay - directly linked to the pin location
+                            Group {
+                                if gpsLocation.isActive {
+                                    Circle()
+                                        .stroke(Color.blue, lineWidth: 2)
+                                        .fill(Color.blue.opacity(0.1))
+                                        .frame(width: radiusCircleSize, height: radiusCircleSize)
+                                        .position(radiusCircleCenterPosition)
+                                }
+                            }
+                        )
+
                         .frame(height: max(200, min(300, geometry.size.height * 0.35)))
                         .cornerRadius(12)
-                        .onTapGesture {
-                            // Handle tap to set location
-                            let coordinate = region.center
-                            updateGPSLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-                        }
                         
                         // Radius Control
                         VStack(spacing: 6) {
@@ -148,13 +172,52 @@ struct GPSLocationStepView: View {
             }
         }
         .onAppear {
+            // Ensure we have a valid map region first
+            if region.center.latitude == 0 && region.center.longitude == 0 {
+                // Initialize with a default region if none is set
+                region = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                )
+            }
+            
             setupLocation()
+            
+            // Also try to get location immediately if we have permission
+            if locationProvider.authorizationStatus == .authorizedWhenInUse || 
+               locationProvider.authorizationStatus == .authorizedAlways {
+                locationProvider.startLocationUpdates()
+                
+                // Try to get current location immediately
+                if let currentLocation = locationProvider.currentLocation {
+                    updateGPSLocation(latitude: currentLocation.coordinate.latitude, 
+                                     longitude: currentLocation.coordinate.longitude)
+                }
+            }
         }
     }
     
     private var mapAnnotations: [LocationAnnotation] {
         guard gpsLocation.isActive else { return [] }
         return [LocationAnnotation(coordinate: CLLocationCoordinate2D(latitude: gpsLocation.latitude, longitude: gpsLocation.longitude))]
+    }
+    
+    // Computed properties for radius circle visualization
+    private var radiusCircleSize: CGFloat {
+        // Convert radius from meters to visual size on map
+        // Scale based on the map's current zoom level (span)
+        let metersPerPixel = region.span.latitudeDelta * 111000.0 / 300.0 // Approximate meters per pixel
+        let radiusInPixels = CGFloat(gpsLocation.radius) / metersPerPixel
+        return max(20, min(200, radiusInPixels))
+    }
+    
+    private var radiusCircleCenterPosition: CGPoint {
+        // Position the circle at the center of the map view (where the pin is)
+        // This ensures the circle is always centered on the pin location
+        let mapHeight = max(200, min(300, UIScreen.main.bounds.height * 0.35))
+        
+        // The circle should be centered on the map view since the map is centered on the GPS coordinates
+        return CGPoint(x: UIScreen.main.bounds.width / 2, y: mapHeight / 2)
     }
     
     private func circleSize(for radius: Double) -> CGFloat {
@@ -170,12 +233,74 @@ struct GPSLocationStepView: View {
         // Request location permissions
         if locationProvider.authorizationStatus == .notDetermined {
             locationProvider.requestAuthorization()
+            // Check again after a short delay to see if authorization was granted
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.checkAndSetLocation()
+            }
+        } else if locationProvider.authorizationStatus == .authorizedWhenInUse || 
+                  locationProvider.authorizationStatus == .authorizedAlways {
+            checkAndSetLocation()
         }
         
+        // If we already have a GPS location, center the map on it
+        if gpsLocation.isActive {
+            region = MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: gpsLocation.latitude, longitude: gpsLocation.longitude),
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            )
+        } else {
+            // If no GPS location yet, try to get current location immediately
+            if let currentLocation = locationProvider.currentLocation {
+                updateGPSLocation(latitude: currentLocation.coordinate.latitude, 
+                                 longitude: currentLocation.coordinate.longitude)
+            } else {
+                // If no current location available yet, set a default region and wait for location
+                // This ensures the map has a valid region even before location is available
+                region = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194), // Default to San Francisco
+                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                )
+            }
+        }
+    }
+    
+    private func checkAndSetLocation() {
         // Try to get current location if we have permission
         if locationProvider.authorizationStatus == .authorizedWhenInUse || 
            locationProvider.authorizationStatus == .authorizedAlways {
             locationProvider.startLocationUpdates()
+            
+            // Automatically try to set current location if GPS location is not already active
+            if !gpsLocation.isActive {
+                // Try to get current location immediately first
+                if let currentLocation = locationProvider.currentLocation {
+                    updateGPSLocation(latitude: currentLocation.coordinate.latitude, 
+                                     longitude: currentLocation.coordinate.longitude)
+                } else {
+                    // Small delay to allow location manager to start
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.autoSetCurrentLocation()
+                    }
+                }
+            }
+        }
+    }
+    
+    private func autoSetCurrentLocation() {
+        // Check if we already have a current location
+        if let currentLocation = locationProvider.currentLocation {
+            updateGPSLocation(latitude: currentLocation.coordinate.latitude, 
+                             longitude: currentLocation.coordinate.longitude)
+            logger.debug("Auto-set current location: \(currentLocation.coordinate.latitude), \(currentLocation.coordinate.longitude)")
+        } else {
+            // If no current location yet, wait a bit longer and try again
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                if let currentLocation = self.locationProvider.currentLocation {
+                    self.updateGPSLocation(latitude: currentLocation.coordinate.latitude, 
+                                          longitude: currentLocation.coordinate.longitude)
+                    self.logger.debug("Auto-set current location (delayed): \(currentLocation.coordinate.latitude), \(currentLocation.coordinate.longitude)")
+                }
+            }
         }
     }
     
@@ -223,12 +348,14 @@ struct GPSLocationStepView: View {
         gpsLocation = GPSLocation(latitude: latitude, longitude: longitude, radius: gpsLocation.radius)
         
         // Update map region to center on the new location
+        // This ensures the pin appears at the exact GPS coordinates
         region = MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
             span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         )
         
         logger.debug("GPS location set: \(latitude), \(longitude), radius: \(gpsLocation.radius)")
+        logger.debug("Map region updated to center: \(region.center.latitude), \(region.center.longitude)")
     }
 }
 

@@ -139,27 +139,54 @@ struct HomePageViewContent: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                .background(Color.yellow.opacity(0.1))
                 .refreshable {
                     // Pull-to-refresh functionality
                     blockingEngineViewModel.refreshRules()
                 }
-                .navigationTitle("Limmi")
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Image("yellowbrainblacklinedots copy")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 40)
+                    }
+                    
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button(action: {
                             showingRuleCreation = true
                         }) {
                             Image(systemName: "plus")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(
+                                    Circle()
+                                        .fill(Color.blue)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(
+                                                    LinearGradient(
+                                                        colors: [.yellow, .orange, .yellow],
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    ),
+                                                    lineWidth: 2
+                                                )
+                                                .shadow(color: .yellow.opacity(0.8), radius: 4, x: 0, y: 0)
+                                        )
+                                )
+                                .scaleEffect(1.0)
+                                .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: UUID())
                         }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
+                        .buttonStyle(.plain)
                     }
                 }
             }
             .tabItem {
-                Image(systemName: "shield.lefthalf.filled")
+                Image(systemName: "brain.head.profile")
+                    .font(.system(size: 15))
                 Text("Rules")
             }
             .tag(0)
@@ -169,6 +196,7 @@ struct HomePageViewContent: View {
             }
             .tabItem {
                 Image(systemName: "gearshape.fill")
+                    .font(.system(size: 15))
                 Text("Settings")
             }
             .tag(1)

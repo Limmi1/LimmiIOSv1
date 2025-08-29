@@ -1,4 +1,12 @@
 import SwiftUI
+import MapKit
+import CoreLocation
+
+// Simple annotation struct for the map
+private struct MapAnnotation: Identifiable {
+    let id = UUID()
+    let coordinate: CLLocationCoordinate2D
+}
 
 struct RuleCard: View {
     let rule: Rule
@@ -11,6 +19,55 @@ struct RuleCard: View {
         // Access blockingConditionsChanged to trigger updates when conditions change
         _ = blockingEngineViewModel.blockingConditionsChanged
         return blockingEngineViewModel.isRuleCurrentlyBlocking(rule)
+    }
+    
+    // Computed properties for GPS location map preview
+    private var regionForRule: MKCoordinateRegion {
+        guard rule.gpsLocation.isActive else {
+            return MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            )
+        }
+        
+        let center = CLLocationCoordinate2D(
+            latitude: rule.gpsLocation.latitude,
+            longitude: rule.gpsLocation.longitude
+        )
+        
+        // Calculate span based on radius to show the full coverage area
+        let radiusInDegrees = rule.gpsLocation.radius / 111000.0 // Approximate conversion from meters to degrees
+        let span = MKCoordinateSpan(
+            latitudeDelta: radiusInDegrees * 2.5, // Show area slightly larger than radius
+            longitudeDelta: radiusInDegrees * 2.5
+        )
+        
+        return MKCoordinateRegion(center: center, span: span)
+    }
+    
+    private var mapAnnotationsForRule: [MapAnnotation] {
+        guard rule.gpsLocation.isActive else { return [] }
+        return [MapAnnotation(
+            coordinate: CLLocationCoordinate2D(
+                latitude: rule.gpsLocation.latitude,
+                longitude: rule.gpsLocation.longitude
+            )
+        )]
+    }
+    
+    private var radiusCircleSizeForRule: CGFloat {
+        guard rule.gpsLocation.isActive else { return 0 }
+        // Scale the circle size to fit within the 80px map height
+        let maxSize: CGFloat = 60 // Leave some margin
+        let radiusInDegrees = rule.gpsLocation.radius / 111000.0
+        let spanInDegrees = regionForRule.span.latitudeDelta
+        let scaleFactor = maxSize / (spanInDegrees * 1000) // Scale factor for visual representation
+        return min(maxSize, CGFloat(radiusInDegrees) * scaleFactor)
+    }
+    
+    private var radiusCirclePositionForRule: CGPoint {
+        // Center the circle in the 80px map
+        return CGPoint(x: 40, y: 40)
     }
     
     var body: some View {
@@ -79,6 +136,41 @@ struct RuleCard: View {
                         Text("GPS Zone: \(Int(rule.gpsLocation.radius))m radius")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                    }
+                    
+                    // GPS Location Map Preview
+                    if rule.gpsLocation.isActive {
+                        VStack(spacing: 4) {
+                            ZStack {
+                                // Map background placeholder
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.systemGray6))
+                                    .frame(height: 80)
+                                
+                                // Map content
+                                Map(coordinateRegion: .constant(regionForRule), 
+                                     showsUserLocation: false, 
+                                     annotationItems: mapAnnotationsForRule) { annotation in
+                                    MapPin(coordinate: annotation.coordinate, tint: .blue)
+                                }
+                                .frame(height: 80)
+                                .cornerRadius(8)
+                                .overlay(
+                                    // Radius circle overlay
+                                    Circle()
+                                        .stroke(Color.blue, lineWidth: 2)
+                                        .fill(Color.blue.opacity(0.1))
+                                        .frame(width: radiusCircleSizeForRule, height: radiusCircleSizeForRule)
+                                        .position(radiusCirclePositionForRule)
+                                )
+                            }
+                            
+                            // Location coordinates
+                            Text("\(String(format: "%.4f", rule.gpsLocation.latitude)), \(String(format: "%.4f", rule.gpsLocation.longitude))")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
                     }
                     
                     // Beacon Info
