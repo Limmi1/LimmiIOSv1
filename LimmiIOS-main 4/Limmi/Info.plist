@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.ah.limmi.app</string>
+	</array>
+	<key>FIRAnalyticsDebugEnabled</key>
+	<true/>
+	<key>FIRDebugEnabled</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>bluetooth-peripheral</string>
+		<string>processing</string>
+		<string>fetch</string>
+		<string>bluetooth-central</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.ah.limmi.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>limmi</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
