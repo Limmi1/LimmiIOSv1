@@ -284,9 +284,9 @@ struct HomePageViewContent: View {
                         }
                     }
                     .padding(.vertical, DesignSystem.spacingL)
-                                    .background(DesignSystem.neutralBackground)
+                                    .background(DesignSystem.subtleYellowBackground)
             }
-            .background(DesignSystem.neutralBackground)
+            .background(DesignSystem.subtleYellowBackground)
                 .sheet(isPresented: $showingRuleCreation) {
                     RuleCreationFlowView(ruleCreationMode: ruleCreationMode)
                 }
