@@ -289,7 +289,7 @@ struct HomePageViewContent: View {
                 }
             }
             .tabItem {
-                Image(systemName: "shield.lefthalf.filled")
+                Image("spaceslogo")
                 Text("Spaces")
             }
             .tag(0)
