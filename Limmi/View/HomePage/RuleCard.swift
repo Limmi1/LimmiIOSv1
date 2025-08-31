@@ -35,44 +35,44 @@ struct RuleCard: View {
                 
                 // Status Chips
                 HStack(spacing: DesignSystem.spacingS) {
-                    // Rule Active Status
-                    Text(rule.isActive ? "Active" : "Inactive")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(rule.isActive ? .green : DesignSystem.secondaryBlue)
-                        .padding(.horizontal, DesignSystem.spacingS)
-                        .padding(.vertical, 6)
-                        .frame(height: 28)
-                        .background(
-                            RoundedRectangle(cornerRadius: DesignSystem.chipCornerRadius)
-                                .fill(rule.isActive ? .green.opacity(0.1) : DesignSystem.secondaryBlue.opacity(0.1))
-                        )
-                    
-                    // Blocking Status Indicator
+                    // Blocking Status Indicator (Dominant Badge)
                     if rule.isActive {
                         HStack(spacing: DesignSystem.spacingXS) {
                             Image(systemName: isCurrentlyBlocking ? "shield.fill" : "shield")
                                 .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.secondaryBlue)
+                                .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.mutedGreen)
                             
                             Text(isCurrentlyBlocking ? "Blocking" : "Not Blocking")
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.secondaryBlue)
+                                .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.mutedGreen)
                         }
                         .padding(.horizontal, DesignSystem.spacingS)
                         .padding(.vertical, 6)
                         .frame(height: 28)
                         .background(
                             RoundedRectangle(cornerRadius: DesignSystem.chipCornerRadius)
-                                .fill(isCurrentlyBlocking ? .red.opacity(0.1) : DesignSystem.secondaryBlue.opacity(0.1))
+                                .fill(isCurrentlyBlocking ? .red.opacity(0.1) : DesignSystem.mutedGreen.opacity(0.1))
                         )
                     }
+                    
+                    // Rule Active Status (Secondary Badge)
+                    Text(rule.isActive ? "Active" : "Inactive")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(rule.isActive ? .green : .gray)
+                        .padding(.horizontal, DesignSystem.spacingS)
+                        .padding(.vertical, 6)
+                        .frame(height: 28)
+                        .background(
+                            RoundedRectangle(cornerRadius: DesignSystem.chipCornerRadius)
+                                .stroke(rule.isActive ? .green : .gray, lineWidth: 1)
+                        )
                 }
                 
                 // Compact Meta Info Row
                 HStack(spacing: DesignSystem.spacingS) {
                     // GPS Info
                     HStack(spacing: 4) {
-                        Image(systemName: "location.fill")
+                        Image(systemName: "location")
                             .font(.system(size: 12))
                             .foregroundColor(DesignSystem.secondaryBlue)
                         
@@ -107,7 +107,7 @@ struct RuleCard: View {
                     // Blocked Apps Info
                     if !rule.blockedTokenIds.isEmpty {
                         HStack(spacing: 4) {
-                            Image(systemName: "app.badge.fill")
+                            Image(systemName: "app.badge")
                                 .font(.system(size: 12))
                                 .foregroundColor(.red)
                             
@@ -125,7 +125,7 @@ struct RuleCard: View {
             .cornerRadius(DesignSystem.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
-                    .stroke(DesignSystem.secondaryBlue, lineWidth: DesignSystem.borderWidth)
+                    .stroke(DesignSystem.secondaryBlue.opacity(0.3), lineWidth: 1)
             )
             .shadow(
                 color: DesignSystem.subtleShadow.color,

@@ -22,6 +22,9 @@ public struct DesignSystem {
     /// Off-white light yellow for main app background - warm and inviting
     public static let backgroundYellow = Color(hex: "F5F0D6")
     
+    /// Unified neutral background for homepage
+    public static let neutralBackground = Color(hex: "FAFAFA")
+    
     /// Muted red for blocked/restricted actions
     public static let mutedRed = Color(hex: "C44536")
     

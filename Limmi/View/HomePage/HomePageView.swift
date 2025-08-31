@@ -134,13 +134,19 @@ struct HomePageViewContent: View {
                     
                     // New Spaces Section
                     VStack(spacing: DesignSystem.spacingL) {
-                        // Section Header
-                        HStack {
-                            Text("New Spaces")
-                                .font(DesignSystem.headingMedium)
-                                .fontWeight(.semibold)
-                                .foregroundColor(DesignSystem.pureBlack)
-                            Spacer()
+                        // Section Header with Divider
+                        VStack(spacing: DesignSystem.spacingS) {
+                            HStack {
+                                Text("New Spaces")
+                                    .font(.system(size: 22, weight: .bold))
+                                    .foregroundColor(DesignSystem.pureBlack)
+                                Spacer()
+                            }
+                            
+                            // Subtle divider line
+                            Rectangle()
+                                .fill(DesignSystem.secondaryBlue.opacity(0.2))
+                                .frame(height: 1)
                         }
                         .padding(.horizontal, DesignSystem.spacingL)
                         
@@ -154,17 +160,20 @@ struct HomePageViewContent: View {
                                 VStack(spacing: DesignSystem.spacingS) {
                                     Image(systemName: "shield.lefthalf.filled")
                                         .font(.system(size: 32))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(DesignSystem.mutedRed)
                                     
                                     Text("Create Blocked Space")
-                                        .font(DesignSystem.bodyText)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(DesignSystem.mutedRed)
                                         .multilineTextAlignment(.center)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 120)
-                                .background(DesignSystem.mutedRed)
+                                .background(DesignSystem.pureWhite)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                                        .stroke(DesignSystem.mutedRed, lineWidth: 2)
+                                )
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .shadow(
                                     color: DesignSystem.subtleShadow.color,
@@ -183,17 +192,20 @@ struct HomePageViewContent: View {
                                 VStack(spacing: DesignSystem.spacingS) {
                                     Image(systemName: "checkmark.shield.fill")
                                         .font(.system(size: 32))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(DesignSystem.mutedGreen)
                                     
                                     Text("Create Allowed Space")
-                                        .font(DesignSystem.bodyText)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(DesignSystem.mutedGreen)
                                         .multilineTextAlignment(.center)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 120)
-                                .background(DesignSystem.mutedGreen)
+                                .background(DesignSystem.pureWhite)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                                        .stroke(DesignSystem.mutedGreen, lineWidth: 2)
+                                )
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .shadow(
                                     color: DesignSystem.subtleShadow.color,
@@ -207,7 +219,6 @@ struct HomePageViewContent: View {
                         .padding(.horizontal, DesignSystem.spacingL)
                     }
                     .padding(.vertical, DesignSystem.spacingL)
-                    .background(DesignSystem.pureWhite.opacity(0.5))
                     
                     // Spacing between sections
                     Spacer()
@@ -215,13 +226,19 @@ struct HomePageViewContent: View {
                     
                     // Existing Spaces Section
                     VStack(spacing: DesignSystem.spacingL) {
-                        // Section Header
-                        HStack {
-                            Text("Existing Spaces")
-                                .font(DesignSystem.headingMedium)
-                                .fontWeight(.semibold)
-                                .foregroundColor(DesignSystem.pureBlack)
-                            Spacer()
+                        // Section Header with Divider
+                        VStack(spacing: DesignSystem.spacingS) {
+                            HStack {
+                                Text("Existing Spaces")
+                                    .font(.system(size: 22, weight: .bold))
+                                    .foregroundColor(DesignSystem.pureBlack)
+                                Spacer()
+                            }
+                            
+                            // Subtle divider line
+                            Rectangle()
+                                .fill(DesignSystem.secondaryBlue.opacity(0.2))
+                                .frame(height: 1)
                         }
                         .padding(.horizontal, DesignSystem.spacingL)
                         
@@ -272,9 +289,9 @@ struct HomePageViewContent: View {
                         }
                     }
                     .padding(.vertical, DesignSystem.spacingL)
-                    .background(DesignSystem.backgroundYellow.opacity(0.8))
-                }
-                .background(DesignSystem.backgroundYellow.opacity(0.8))
+                                    .background(DesignSystem.neutralBackground)
+            }
+            .background(DesignSystem.neutralBackground)
                 .sheet(isPresented: $showingRuleCreation) {
                     RuleCreationFlowView(ruleCreationMode: ruleCreationMode)
                 }
