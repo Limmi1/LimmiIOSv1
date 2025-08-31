@@ -145,7 +145,7 @@ struct HomePageViewContent: View {
                         .padding(.horizontal, DesignSystem.spacingL)
                         
                         // New Space Buttons
-                        HStack(spacing: DesignSystem.spacingM) {
+                        HStack(spacing: 12) {
                             // Create Blocked Space Button
                             Button(action: {
                                 ruleCreationMode = .blocked
@@ -167,10 +167,10 @@ struct HomePageViewContent: View {
                                 .background(DesignSystem.mutedRed)
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .shadow(
-                                    color: DesignSystem.cardShadow.color,
-                                    radius: DesignSystem.cardShadow.radius,
-                                    x: DesignSystem.cardShadow.x,
-                                    y: DesignSystem.cardShadow.y
+                                    color: DesignSystem.subtleShadow.color,
+                                    radius: DesignSystem.subtleShadow.radius,
+                                    x: DesignSystem.subtleShadow.x,
+                                    y: DesignSystem.subtleShadow.y
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -196,10 +196,10 @@ struct HomePageViewContent: View {
                                 .background(DesignSystem.mutedGreen)
                                 .cornerRadius(DesignSystem.cornerRadius)
                                 .shadow(
-                                    color: DesignSystem.cardShadow.color,
-                                    radius: DesignSystem.cardShadow.radius,
-                                    x: DesignSystem.cardShadow.x,
-                                    y: DesignSystem.cardShadow.y
+                                    color: DesignSystem.subtleShadow.color,
+                                    radius: DesignSystem.subtleShadow.radius,
+                                    x: DesignSystem.subtleShadow.x,
+                                    y: DesignSystem.subtleShadow.y
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -208,6 +208,10 @@ struct HomePageViewContent: View {
                     }
                     .padding(.vertical, DesignSystem.spacingL)
                     .background(DesignSystem.pureWhite.opacity(0.5))
+                    
+                    // Spacing between sections
+                    Spacer()
+                        .frame(height: 20)
                     
                     // Existing Spaces Section
                     VStack(spacing: DesignSystem.spacingL) {

@@ -17,111 +17,108 @@ struct RuleCard: View {
         Button(action: {
             showingEditView = true
         }) {
-            HStack(alignment: .top, spacing: DesignSystem.spacingM) {
-                // Left side - Rule Info
-                VStack(alignment: .leading, spacing: DesignSystem.spacingM) {
-                    // Rule Header
-                    VStack(alignment: .leading, spacing: DesignSystem.spacingXS) {
-                        Text(rule.name)
-                            .font(DesignSystem.headingSmall)
-                            .fontWeight(.semibold)
-                            .foregroundColor(DesignSystem.pureBlack)
-                        
-                        HStack(spacing: DesignSystem.spacingS) {
-                            // Rule Active Status
-                            Text(rule.isActive ? "Active" : "Inactive")
-                                .font(DesignSystem.captionText)
-                                .fontWeight(.medium)
-                                .foregroundColor(rule.isActive ? .green : DesignSystem.secondaryBlue)
-                                .padding(.horizontal, DesignSystem.spacingS)
-                                .padding(.vertical, DesignSystem.spacingXS)
-                                .background(
-                                    RoundedRectangle(cornerRadius: DesignSystem.cornerRadius / 3)
-                                        .fill(rule.isActive ? .green.opacity(0.1) : DesignSystem.secondaryBlue.opacity(0.1))
-                                )
-                            
-                            // Blocking Status Indicator
-                            if rule.isActive {
-                                HStack(spacing: DesignSystem.spacingXS) {
-                                    Image(systemName: isCurrentlyBlocking ? "shield.fill" : "shield")
-                                        .font(.system(size: 10, weight: .medium))
-                                        .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.secondaryBlue)
-                                    
-                                    Text(isCurrentlyBlocking ? "Blocking" : "Not Blocking")
-                                        .font(DesignSystem.captionText)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.secondaryBlue)
-                                }
-                                .padding(.horizontal, DesignSystem.spacingS)
-                                .padding(.vertical, DesignSystem.spacingXS)
-                                .background(
-                                    RoundedRectangle(cornerRadius: DesignSystem.cornerRadius / 3)
-                                        .fill(isCurrentlyBlocking ? .red.opacity(0.1) : DesignSystem.secondaryBlue.opacity(0.1))
-                                )
-                            }
-                        }
-                    }
+            VStack(alignment: .leading, spacing: DesignSystem.spacingM) {
+                // Rule Header with Chevron
+                HStack {
+                    Text(rule.name)
+                        .font(DesignSystem.headingSmall)
+                        .fontWeight(.semibold)
+                        .foregroundColor(DesignSystem.pureBlack)
                     
-                    // Rule Info
-                    VStack(alignment: .leading, spacing: DesignSystem.spacingS) {
-                        // Location Info
-                        HStack(spacing: DesignSystem.spacingS) {
-                            Image(systemName: "location.fill")
-                                .font(.system(size: 12))
-                                .foregroundColor(DesignSystem.secondaryBlue)
+                    Spacer()
+                    
+                    // Chevron
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(DesignSystem.secondaryBlue)
+                }
+                
+                // Status Chips
+                HStack(spacing: DesignSystem.spacingS) {
+                    // Rule Active Status
+                    Text(rule.isActive ? "Active" : "Inactive")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(rule.isActive ? .green : DesignSystem.secondaryBlue)
+                        .padding(.horizontal, DesignSystem.spacingS)
+                        .padding(.vertical, 6)
+                        .frame(height: 28)
+                        .background(
+                            RoundedRectangle(cornerRadius: DesignSystem.chipCornerRadius)
+                                .fill(rule.isActive ? .green.opacity(0.1) : DesignSystem.secondaryBlue.opacity(0.1))
+                        )
+                    
+                    // Blocking Status Indicator
+                    if rule.isActive {
+                        HStack(spacing: DesignSystem.spacingXS) {
+                            Image(systemName: isCurrentlyBlocking ? "shield.fill" : "shield")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.secondaryBlue)
                             
-                            Text("GPS Zone: \(Int(rule.gpsLocation.radius))m radius")
-                                .font(DesignSystem.captionText)
-                                .foregroundColor(DesignSystem.secondaryBlue)
+                            Text(isCurrentlyBlocking ? "Blocking" : "Not Blocking")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(isCurrentlyBlocking ? .red : DesignSystem.secondaryBlue)
                         }
-                        
-                        // Beacon Info
-                        if !rule.fineLocationRules.isEmpty {
-                            HStack(spacing: DesignSystem.spacingS) {
-                                Image(systemName: "antenna.radiowaves.left.and.right")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.orange)
-                                
-                                Text("\(rule.fineLocationRules.count) beacon\(rule.fineLocationRules.count == 1 ? "" : "s")")
-                                    .font(DesignSystem.captionText)
-                                    .foregroundColor(DesignSystem.secondaryBlue)
-                            }
-                        }
-                        
-                        // Time Rules Info
-                        if !rule.timeRules.isEmpty {
-                            HStack(spacing: DesignSystem.spacingS) {
-                                Image(systemName: "clock.fill")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.purple)
-                                
-                                Text("\(rule.timeRules.count) time rule\(rule.timeRules.count == 1 ? "" : "s")")
-                                    .font(DesignSystem.captionText)
-                                    .foregroundColor(DesignSystem.secondaryBlue)
-                            }
-                        }
-                        
-                        // Blocked Content Info
-                        if !rule.blockedTokenIds.isEmpty {
-                            HStack(spacing: DesignSystem.spacingS) {
-                                Image(systemName: "app.badge.fill")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.red)
-                                
-                                Text("\(rule.blockedTokenIds.count) blocked item\(rule.blockedTokenIds.count == 1 ? "" : "s")")
-                                    .font(DesignSystem.captionText)
-                                    .foregroundColor(DesignSystem.secondaryBlue)
-                            }
-                        }
+                        .padding(.horizontal, DesignSystem.spacingS)
+                        .padding(.vertical, 6)
+                        .frame(height: 28)
+                        .background(
+                            RoundedRectangle(cornerRadius: DesignSystem.chipCornerRadius)
+                                .fill(isCurrentlyBlocking ? .red.opacity(0.1) : DesignSystem.secondaryBlue.opacity(0.1))
+                        )
                     }
                 }
                 
-                Spacer()
-                
-                // Right side - Chevron
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(DesignSystem.secondaryBlue)
+                // Compact Meta Info Row
+                HStack(spacing: DesignSystem.spacingS) {
+                    // GPS Info
+                    HStack(spacing: 4) {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(DesignSystem.secondaryBlue)
+                        
+                        Text("\(Int(rule.gpsLocation.radius)) m radius")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(DesignSystem.secondaryBlue)
+                    }
+                    
+                    // Separator
+                    Text("•")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(DesignSystem.secondaryBlue.opacity(0.6))
+                    
+                    // Beacon Info
+                    if !rule.fineLocationRules.isEmpty {
+                        HStack(spacing: 4) {
+                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(.orange)
+                            
+                            Text("\(rule.fineLocationRules.count) \(rule.fineLocationRules.count == 1 ? "Beacon" : "Beacons")")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(DesignSystem.secondaryBlue)
+                        }
+                        
+                        // Separator
+                        Text("•")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(DesignSystem.secondaryBlue.opacity(0.6))
+                    }
+                    
+                    // Blocked Apps Info
+                    if !rule.blockedTokenIds.isEmpty {
+                        HStack(spacing: 4) {
+                            Image(systemName: "app.badge.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(.red)
+                            
+                            Text("\(rule.blockedTokenIds.count) \(rule.blockedTokenIds.count == 1 ? "Blocked App" : "Blocked Apps")")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(DesignSystem.secondaryBlue)
+                        }
+                    }
+                    
+                    Spacer()
+                }
             }
             .padding(DesignSystem.cardPadding)
             .background(DesignSystem.pureWhite)
@@ -131,10 +128,10 @@ struct RuleCard: View {
                     .stroke(DesignSystem.secondaryBlue, lineWidth: DesignSystem.borderWidth)
             )
             .shadow(
-                color: DesignSystem.cardShadow.color,
-                radius: DesignSystem.cardShadow.radius,
-                x: DesignSystem.cardShadow.x,
-                y: DesignSystem.cardShadow.y
+                color: DesignSystem.subtleShadow.color,
+                radius: DesignSystem.subtleShadow.radius,
+                x: DesignSystem.subtleShadow.x,
+                y: DesignSystem.subtleShadow.y
             )
         }
         .buttonStyle(PlainButtonStyle())

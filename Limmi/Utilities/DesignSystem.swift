@@ -71,7 +71,10 @@ public struct DesignSystem {
     // MARK: - Component Styles
     
     /// Standard corner radius for cards and buttons
-    public static let cornerRadius: CGFloat = 12
+    public static let cornerRadius: CGFloat = 16
+    
+    /// Corner radius for status chips/badges
+    public static let chipCornerRadius: CGFloat = 12
     
     /// Standard shadow for cards
     public static let cardShadow = Shadow(
@@ -79,6 +82,14 @@ public struct DesignSystem {
         radius: 8,
         x: 0,
         y: 2
+    )
+    
+    /// Subtle shadow for buttons and cards
+    public static let subtleShadow = Shadow(
+        color: .black.opacity(0.08),
+        radius: 6,
+        x: 0,
+        y: 1
     )
     
     /// Standard border width
