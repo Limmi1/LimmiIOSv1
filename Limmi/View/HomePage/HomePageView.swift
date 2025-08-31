@@ -251,7 +251,7 @@ struct HomePageViewContent: View {
                                     LazyVStack(spacing: DesignSystem.spacingM) {
                                         ForEach(ruleStoreViewModel.activeRules) { rule in
                                             RuleCard(rule: rule)
-                                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                                .contextMenu {
                                                     Button(role: .destructive) {
                                                         deleteRule(rule)
                                                     } label: {
