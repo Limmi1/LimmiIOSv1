@@ -13,6 +13,11 @@ struct RuleCard: View {
         return blockingEngineViewModel.isRuleCurrentlyBlocking(rule)
     }
     
+    private var relevantEmoji: String {
+        // Get emoji based on the space name (rule name)
+        return DesignSystem.getRelevantEmoji(for: rule.name)
+    }
+    
     var body: some View {
         Button(action: {
             showingEditView = true
@@ -20,10 +25,15 @@ struct RuleCard: View {
             VStack(alignment: .leading, spacing: DesignSystem.spacingM) {
                 // Rule Header with Chevron
                 HStack {
-                    Text(rule.name)
-                        .font(DesignSystem.headingSmall)
-                        .fontWeight(.semibold)
-                        .foregroundColor(DesignSystem.pureBlack)
+                    HStack(spacing: 8) {
+                        Text(relevantEmoji)
+                            .font(.system(size: 20))
+                        
+                        Text(rule.name)
+                            .font(DesignSystem.headingSmall)
+                            .fontWeight(.semibold)
+                            .foregroundColor(DesignSystem.pureBlack)
+                    }
                     
                     Spacer()
                     
@@ -69,50 +79,50 @@ struct RuleCard: View {
                 }
                 
                 // Compact Meta Info Row
-                HStack(spacing: DesignSystem.spacingS) {
+                HStack(spacing: DesignSystem.ruleCardMetaSpacing) {
                     // GPS Info
-                    HStack(spacing: 4) {
+                    HStack(spacing: DesignSystem.ruleCardMetaSpacing) {
                         Image(systemName: "location")
-                            .font(.system(size: 12))
+                            .font(.system(size: DesignSystem.ruleCardMetaIconSize))
                             .foregroundColor(DesignSystem.secondaryBlue)
                         
-                        Text("\(Int(rule.gpsLocation.radius)) m")
-                            .font(.system(size: 13, weight: .medium))
+                        Text("\(Int(rule.gpsLocation.radius))m")
+                            .font(.system(size: DesignSystem.ruleCardMetaTextSize, weight: .medium))
                             .foregroundColor(DesignSystem.secondaryBlue)
                     }
                     
                     // Separator
                     Text("•")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: DesignSystem.ruleCardMetaIconSize, weight: .medium))
                         .foregroundColor(DesignSystem.secondaryBlue.opacity(0.6))
                     
-                    // Beacon Info
+                    // Limmi Device Info
                     if !rule.fineLocationRules.isEmpty {
-                        HStack(spacing: 4) {
+                        HStack(spacing: DesignSystem.ruleCardMetaSpacing) {
                             Image(systemName: "antenna.radiowaves.left.and.right")
-                                .font(.system(size: 12))
+                                .font(.system(size: DesignSystem.ruleCardMetaIconSize))
                                 .foregroundColor(.orange)
                             
-                            Text("\(rule.fineLocationRules.count) \(rule.fineLocationRules.count == 1 ? "Beacon" : "Beacons")")
-                                .font(.system(size: 13, weight: .medium))
+                            Text("\(rule.fineLocationRules.count) \(rule.fineLocationRules.count == 1 ? "Limmi Device" : "Limmi Devices")")
+                                .font(.system(size: DesignSystem.ruleCardMetaTextSize, weight: .medium))
                                 .foregroundColor(DesignSystem.secondaryBlue)
                         }
                         
                         // Separator
                         Text("•")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(.system(size: DesignSystem.ruleCardMetaIconSize, weight: .medium))
                             .foregroundColor(DesignSystem.secondaryBlue.opacity(0.6))
                     }
                     
                     // Blocked Apps Info
                     if !rule.blockedTokenIds.isEmpty {
-                        HStack(spacing: 4) {
+                        HStack(spacing: DesignSystem.ruleCardMetaSpacing) {
                             Image(systemName: "app.badge")
-                                .font(.system(size: 12))
+                                .font(.system(size: DesignSystem.ruleCardMetaIconSize))
                                 .foregroundColor(.red)
                             
                             Text("\(rule.blockedTokenIds.count) \(rule.blockedTokenIds.count == 1 ? "Blocked App" : "Blocked Apps")")
-                                .font(.system(size: 13, weight: .medium))
+                                .font(.system(size: DesignSystem.ruleCardMetaTextSize, weight: .medium))
                                 .foregroundColor(DesignSystem.secondaryBlue)
                         }
                     }
@@ -143,7 +153,6 @@ struct RuleCard: View {
                 .environmentObject(blockingEngineViewModel)
         }
     }
-    
 }
 
 /*

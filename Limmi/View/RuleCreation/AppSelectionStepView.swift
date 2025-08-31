@@ -16,34 +16,32 @@ struct AppSelectionStepView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            
             ScrollView {
-                VStack(spacing: 32) {
+                LazyVStack(spacing: 24) {
                     // Hero Section
                     VStack(spacing: 16) {
                         Image(systemName: "apps.iphone")
                             .font(.system(size: 64))
-                            .foregroundStyle(.red)
-                        .scaleEffect(!selectedTokens.isEmpty ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 0.3), value: selectedTokens.isEmpty)
+                            .foregroundStyle(DesignSystem.homepageRed)
+                            .scaleEffect(!selectedTokens.isEmpty ? 1.1 : 1.0)
+                            .animation(.easeInOut(duration: 0.3), value: selectedTokens.isEmpty)
                         
                         VStack(spacing: 8) {
                             Text(ruleCreationMode.isBlockingEnabled ? "Select apps to block" : "Select apps to allow")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
+                                .font(DesignSystem.headingMedium)
+                                .foregroundColor(DesignSystem.createRuleTextPrimary)
                                 .multilineTextAlignment(.center)
                             
                             Text(ruleCreationMode.isBlockingEnabled ? 
                                 "Choose which apps, categories, or websites should be blocked when you're not near the beacon" :
                                 "Choose which apps, categories, or websites should be allowed when you're near the beacon")
-                                .font(.body)
-                                .foregroundColor(.secondary)
+                                .font(DesignSystem.bodyText)
+                                .foregroundColor(DesignSystem.createRuleTextSecondary)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(3)
                         }
                     }
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, 16)
                     
                     // App Selection Button
                     Button(action: {
@@ -52,71 +50,94 @@ struct AppSelectionStepView: View {
                         HStack(spacing: 16) {
                             Image(systemName: "plus.circle.fill")
                                 .font(.system(size: 24))
-                                .foregroundColor(.blue)
+                                .foregroundColor(DesignSystem.homepageBlue)
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Select Content")
-                                    .font(.headline)
+                                    .font(DesignSystem.headingSmall)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(DesignSystem.createRuleTextPrimary)
                                 
                                 Text(selectedTokens.isEmpty ? "Tap to choose apps, categories, or websites" : "\(selectedTokens.count) item\(selectedTokens.count == 1 ? "" : "s") selected")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .font(DesignSystem.bodyTextSmall)
+                                    .foregroundColor(DesignSystem.createRuleTextSecondary)
                             }
                             
                             Spacer()
                             
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(DesignSystem.createRuleTextSecondary)
                         }
                         .padding(20)
-                        .background(Color(.systemBackground))
-                        .cornerRadius(16)
+                        .background(DesignSystem.homepageCardBackground)
+                        .cornerRadius(DesignSystem.cornerRadius)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color(.systemGray4), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
                         )
-                        .shadow(color: .black.opacity(0.02), radius: 4, x: 0, y: 2)
+                        .shadow(
+                            color: DesignSystem.subtleShadow.color,
+                            radius: DesignSystem.subtleShadow.radius,
+                            x: DesignSystem.subtleShadow.x,
+                            y: DesignSystem.subtleShadow.y
+                        )
                     }
                     .disabled(isCreating)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 16)
                     
                     // Selected Content Preview
                     if !selectedTokens.isEmpty {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Selected Content")
-                                .font(.headline)
+                                .font(DesignSystem.headingSmall)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                                .padding(.horizontal, 24)
+                                .foregroundColor(DesignSystem.createRuleTextPrimary)
+                                .padding(.horizontal, 16)
 
                             LazyVStack(spacing: 8) {
                                 ForEach(Array(selectedTokens.enumerated()), id: \.offset) { index, token in
                                     TokenPreviewCard(token: token, index: index + 1)
                                 }
                             }
-                            .padding(.horizontal, 24)
+                            .padding(.horizontal, 16)
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        .background(DesignSystem.homepageCardBackground)
+                        .cornerRadius(DesignSystem.cornerRadius)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+                        )
+                        .shadow(
+                            color: DesignSystem.subtleShadow.color,
+                            radius: DesignSystem.subtleShadow.radius,
+                            x: DesignSystem.subtleShadow.x,
+                            y: DesignSystem.subtleShadow.y
+                        )
                     }
                     
                     // Validation Message
                     if showingAppValidation {
                         Label("Please select at least one item to continue", systemImage: "exclamationmark.triangle.fill")
-                            .font(.caption)
-                            .foregroundColor(.red)
+                            .font(DesignSystem.captionText)
+                            .foregroundColor(DesignSystem.homepageRed)
                             .transition(.opacity)
+                            .padding(.horizontal, 16)
                     }
                     
                     Spacer(minLength: 100)
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 20)
             }
+            .background(DesignSystem.homepageBackground)
             
             // Create Rule Button
             VStack(spacing: 0) {
                 Divider()
-                    .background(Color(.systemGray5))
+                    .background(DesignSystem.homepageCardBorder)
                 
                 Button(action: validateAndProceed) {
                     HStack(spacing: 12) {
@@ -127,7 +148,8 @@ struct AppSelectionStepView: View {
                         }
                         
                         Text(isCreating ? "Creating Rule..." : "Create Rule")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(DesignSystem.bodyText)
+                            .fontWeight(.semibold)
                         
                         if !isCreating {
                             Image(systemName: "checkmark")
@@ -138,29 +160,29 @@ struct AppSelectionStepView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 54)
                     .background(
-                        RoundedRectangle(cornerRadius: 16)
-                        .fill(selectedTokens.isEmpty || isCreating ? .gray.opacity(0.3) : .green)
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                        .fill(selectedTokens.isEmpty || isCreating ? Color.gray.opacity(0.3) : DesignSystem.homepageGreen)
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                        .stroke(selectedTokens.isEmpty || isCreating ? .clear : .green.opacity(0.3), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                        .stroke(selectedTokens.isEmpty || isCreating ? Color.clear : DesignSystem.homepageGreen.opacity(0.3), lineWidth: 1)
                     )
                 }
                 .disabled(selectedTokens.isEmpty || isCreating)
                 .scaleEffect(selectedTokens.isEmpty || isCreating ? 0.98 : 1.0)
                 .animation(.easeInOut(duration: 0.2), value: selectedTokens.isEmpty || isCreating)
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 16)
                 .padding(.vertical, 16)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(DesignSystem.homepageCardBackground)
         }
-        .background(Color(.systemGroupedBackground))
-            .sheet(isPresented: $showingAppPicker) {
-                TokenSelectionPickerSheet(
-                    selection: $familySelection,
-                    selectedTokens: $selectedTokens
-                )
-            }
+        .background(DesignSystem.homepageBackground)
+        .sheet(isPresented: $showingAppPicker) {
+            TokenSelectionPickerSheet(
+                selection: $familySelection,
+                selectedTokens: $selectedTokens
+            )
+        }
     }
     
     private func validateAndProceed() {
@@ -191,8 +213,8 @@ struct TokenSelectionPickerSheet: View {
                 // Header
                 HStack {
                     Text("\(totalSelectedCount) selected")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .font(DesignSystem.bodyTextSmall)
+                        .foregroundColor(DesignSystem.createRuleTextSecondary)
                         .padding(.leading)
                     
                     Spacer()
@@ -203,6 +225,7 @@ struct TokenSelectionPickerSheet: View {
                 FamilyActivityPicker(selection: $selection)
                 
                 Divider()
+                    .background(DesignSystem.homepageCardBorder)
                 
                 // Accept Button
                 Button("Accept") {
@@ -210,12 +233,13 @@ struct TokenSelectionPickerSheet: View {
                     dismiss()
                 }
                 .disabled(totalSelectedCount == 0)
-                .font(.headline)
+                .font(DesignSystem.headingSmall)
+                .fontWeight(.semibold)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
-                .background(.blue)
-                .cornerRadius(12)
+                .background(DesignSystem.homepageBlue)
+                .cornerRadius(DesignSystem.cornerRadius)
                 .padding()
             }
             .navigationTitle("Select Content")
@@ -225,6 +249,7 @@ struct TokenSelectionPickerSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(DesignSystem.homepageBlue)
                 }
             }
         }
@@ -289,7 +314,7 @@ struct TokenPreviewCard: View {
     var tokenIcon: String {
         switch token.type {
         case .application:
-            return "apps.iphone"
+            return "app"
         case .webDomain:
             return "globe"
         case .activityCategory:
@@ -300,9 +325,9 @@ struct TokenPreviewCard: View {
     var tokenColor: Color {
         switch token.type {
         case .application:
-            return .blue
+            return DesignSystem.homepageBlue
         case .webDomain:
-            return .green
+            return DesignSystem.homepageGreen
         case .activityCategory:
             return .orange
         }
@@ -310,17 +335,6 @@ struct TokenPreviewCard: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // Token Index
-            ZStack {
-                Circle()
-                    .fill(tokenColor.opacity(0.1))
-                    .frame(width: 32, height: 32)
-                
-                Text("\(index)")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(tokenColor)
-            }
-            
             // Token Icon
             Image(systemName: tokenIcon)
                 .font(.system(size: 16))
@@ -330,29 +344,36 @@ struct TokenPreviewCard: View {
             // Token Info
             VStack(alignment: .leading, spacing: 2) {
                 Text(token.displayName)
-                    .font(.subheadline)
+                    .font(DesignSystem.bodyTextSmall)
                     .fontWeight(.medium)
-                    .foregroundColor(.primary)
+                    .foregroundColor(DesignSystem.createRuleTextPrimary)
                 
-                Text("\(token.type.rawValue.capitalized) • Selected for blocking")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    Text(token.type.rawValue.capitalized)
+                        .font(DesignSystem.captionText)
+                        .foregroundColor(DesignSystem.createRuleTextSecondary)
+                    
+                    Text("•")
+                        .font(DesignSystem.captionText)
+                        .foregroundColor(DesignSystem.createRuleTextSecondary)
+                    
+                    Text("Selected for blocking")
+                        .font(DesignSystem.captionText)
+                        .foregroundColor(DesignSystem.createRuleTextSecondary)
+                }
             }
             
             Spacer()
             
-            // Blocked indicator
-            Image(systemName: "minus.circle.fill")
-                .font(.system(size: 20))
-                .foregroundColor(.red)
+            // Selection indicator
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundColor(DesignSystem.homepageGreen)
         }
-        .padding(12)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color(.systemGray5), lineWidth: 1)
-        )
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color(.systemGray6))
+        .cornerRadius(8)
     }
 }
 

@@ -27,31 +27,70 @@ struct GPSLocationStepView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     // Location Status and Controls
-                    VStack(spacing: 12) {
+                    VStack(spacing: 16) {
                         if isLocationLoading {
                             HStack {
                                 ProgressView()
                                     .scaleEffect(0.8)
+                                    .foregroundColor(DesignSystem.primaryYellow)
                                 Text("Getting current location...")
-                                    .foregroundColor(.secondary)
+                                    .font(DesignSystem.bodyText)
+                                    .foregroundColor(DesignSystem.secondaryBlue)
                             }
                         } else if let error = locationError {
-                            Text(error)
-                                .foregroundColor(.red)
-                                .font(.caption)
-                                .multilineTextAlignment(.center)
-                        } else if gpsLocation.isActive {
-                            VStack(spacing: 6) {
-                                HStack {
-                                    Image(systemName: "location.fill")
-                                        .foregroundColor(.green)
-                                    Text("GPS Location Set")
-                                        .font(.headline)
-                                        .foregroundColor(.green)
-                                }
-                                Text("Lat: \(gpsLocation.latitude, specifier: "%.5f"), Lng: \(gpsLocation.longitude, specifier: "%.5f")")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.red)
+                                Text(error)
+                                    .font(DesignSystem.captionText)
+                                    .foregroundColor(.red)
+                                    .multilineTextAlignment(.center)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    // Map View - Adaptive height based on screen size
+                    VStack(spacing: 16) {
+                        Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: mapAnnotations) { annotation in
+                            MapPin(coordinate: annotation.coordinate, tint: DesignSystem.primaryYellow)
+                        }
+                        .frame(height: max(200, min(300, geometry.size.height * 0.35)))
+                        .cornerRadius(DesignSystem.cornerRadius)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                                .stroke(DesignSystem.secondaryBlue.opacity(0.3), lineWidth: 1)
+                        )
+                        .onTapGesture {
+                            // Handle tap to set location
+                            let coordinate = region.center
+                            updateGPSLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                        }
+                        
+                        // Radius Control
+                        VStack(spacing: 12) {
+                            Text("Radius: \(Int(gpsLocation.radius))m")
+                                .font(DesignSystem.headingSmall)
+                                .fontWeight(.semibold)
+                                .foregroundColor(DesignSystem.pureBlack)
+                            
+                            HStack {
+                                Text("50m")
+                                    .font(DesignSystem.captionText)
+                                    .foregroundColor(DesignSystem.secondaryBlue)
+                                
+                                Slider(value: Binding(
+                                    get: { gpsLocation.radius },
+                                    set: { newValue in
+                                        gpsLocation.radius = newValue
+                                        radiusText = String(Int(newValue))
+                                    }
+                                ), in: 50...1000, step: 25)
+                                .accentColor(DesignSystem.primaryYellow)
+                                
+                                Text("1km")
+                                    .font(DesignSystem.captionText)
+                                    .foregroundColor(DesignSystem.secondaryBlue)
                             }
                         }
                         
@@ -64,53 +103,13 @@ struct GPSLocationStepView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
                             .padding(.horizontal)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
+                            .background(DesignSystem.primaryYellow)
+                            .foregroundColor(DesignSystem.pureBlack)
+                            .cornerRadius(DesignSystem.cornerRadius)
                         }
                         .disabled(isLocationLoading)
                     }
-                    .padding(.horizontal)
-                    
-                    // Map View - Adaptive height based on screen size
-                    VStack(spacing: 10) {
-                        Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: mapAnnotations) { annotation in
-                            MapPin(coordinate: annotation.coordinate, tint: .blue)
-                        }
-                        .frame(height: max(200, min(300, geometry.size.height * 0.35)))
-                        .cornerRadius(12)
-                        .onTapGesture {
-                            // Handle tap to set location
-                            let coordinate = region.center
-                            updateGPSLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-                        }
-                        
-                        // Radius Control
-                        VStack(spacing: 6) {
-                            Text("Radius: \(Int(gpsLocation.radius))m")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            
-                            HStack {
-                                Text("50m")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                
-                                Slider(value: Binding(
-                                    get: { gpsLocation.radius },
-                                    set: { newValue in
-                                        gpsLocation.radius = newValue
-                                        radiusText = String(Int(newValue))
-                                    }
-                                ), in: 50...1000, step: 25)
-                                
-                                Text("1km")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
+                    .padding(.horizontal, 24)
                     
                     // Add some space before buttons, but not too much on small screens
                     Spacer(minLength: geometry.size.height < 600 ? 20 : 40)
@@ -128,18 +127,26 @@ struct GPSLocationStepView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.gray.opacity(0.2))
-                    .foregroundColor(.primary)
-                    .cornerRadius(12)
+                    .background(DesignSystem.outlineButtonStyle.backgroundColor)
+                    .foregroundColor(DesignSystem.outlineButtonStyle.textColor)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(DesignSystem.outlineButtonStyle.borderColor, lineWidth: DesignSystem.outlineButtonStyle.borderWidth)
+                    )
+                    .cornerRadius(DesignSystem.cornerRadius)
                     
                     Button("Next") {
                         onNext()
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(gpsLocation.isActive ? Color.blue : Color.gray.opacity(0.3))
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+                    .background(gpsLocation.isActive ? DesignSystem.secondaryButtonStyle.backgroundColor : Color.gray.opacity(0.3))
+                    .foregroundColor(gpsLocation.isActive ? DesignSystem.secondaryButtonStyle.textColor : .gray)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(gpsLocation.isActive ? DesignSystem.secondaryButtonStyle.borderColor : Color.clear, lineWidth: DesignSystem.outlineButtonStyle.borderWidth)
+                    )
+                    .cornerRadius(DesignSystem.cornerRadius)
                     .disabled(!gpsLocation.isActive)
                 }
                 .padding(.horizontal)
@@ -176,6 +183,14 @@ struct GPSLocationStepView: View {
         if locationProvider.authorizationStatus == .authorizedWhenInUse || 
            locationProvider.authorizationStatus == .authorizedAlways {
             locationProvider.startLocationUpdates()
+            
+            // Automatically set current location after a short delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                if let currentLocation = self.locationProvider.currentLocation {
+                    self.updateGPSLocation(latitude: currentLocation.coordinate.latitude, 
+                                          longitude: currentLocation.coordinate.longitude)
+                }
+            }
         }
     }
     

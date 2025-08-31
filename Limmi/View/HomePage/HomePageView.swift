@@ -249,7 +249,7 @@ struct HomePageViewContent: View {
                                                 .fontWeight(.semibold)
                                                 .foregroundColor(DesignSystem.pureBlack)
                                             
-                                            Text("Create your first space to start managing apps based on location and time")
+                                            Text("Create your first space to start managing apps based on location")
                                                 .font(DesignSystem.bodyText)
                                                 .foregroundColor(DesignSystem.secondaryBlue)
                                                 .multilineTextAlignment(.center)

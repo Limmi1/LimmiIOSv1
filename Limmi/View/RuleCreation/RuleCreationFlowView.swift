@@ -69,7 +69,7 @@ struct RuleCreationFlowView: View {
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .disabled(isCreatingRule)
             }
-            .background(DesignSystem.backgroundYellow)
+            .background(DesignSystem.subtleYellowBackground)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(ruleCreationMode.title)
             .toolbar {
@@ -105,12 +105,6 @@ struct RuleCreationFlowView: View {
                         ProgressView()
                             .scaleEffect(0.8)
                             .progressViewStyle(CircularProgressViewStyle(tint: DesignSystem.primaryYellow))
-                    } else if currentStep == .name {
-                        Button("Cancel") {
-                            dismiss()
-                        }
-                        .font(DesignSystem.bodyText)
-                        .foregroundColor(DesignSystem.secondaryBlue)
                     }
                 }
             }
@@ -210,7 +204,7 @@ enum RuleCreationStep: Int, CaseIterable {
     
     var title: String {
         switch self {
-        case .name: return "Name Your Rule"
+        case .name: return "Name Your Space"
         case .beacon: return "Select Beacon"
         case .location: return "Set GPS Location"
         case .apps: return "Choose Apps"
@@ -219,7 +213,7 @@ enum RuleCreationStep: Int, CaseIterable {
     
     var subtitle: String {
         switch self {
-        case .name: return "Give your rule a memorable name"
+        case .name: return "Give your space a memorable name"
         case .beacon: return "Pick a beacon to control access"
         case .location: return "Set GPS boundary for the rule"
         case .apps: return "Select content to block"
@@ -280,7 +274,6 @@ struct ProgressHeaderView: View {
         .padding(.horizontal, DesignSystem.spacingXL)
         .padding(.bottom, DesignSystem.spacingXL)
         .frame(maxWidth: .infinity)
-        .background(DesignSystem.backgroundYellow)
     }
 }
 

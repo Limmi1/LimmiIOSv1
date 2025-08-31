@@ -9,34 +9,14 @@ struct RuleNameStepView: View {
     
     var body: some View {
         VStack(spacing: DesignSystem.spacingXXL) {
-            // Hero Section
-            VStack(spacing: DesignSystem.spacingL) {
-                Image(systemName: "shield.lefthalf.filled.badge.checkmark")
-                    .font(.system(size: 64))
-                    .foregroundStyle(DesignSystem.primaryYellow)
-                    .scaleEffect(ruleName.isEmpty ? 1.0 : 1.1)
-                    .animation(.easeInOut(duration: 0.3), value: ruleName.isEmpty)
-                
-                VStack(spacing: DesignSystem.spacingS) {
-                    Text("What should we call this rule?")
-                        .font(DesignSystem.headingMedium)
-                        .fontWeight(.semibold)
-                        .foregroundColor(DesignSystem.pureBlack)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("Choose a name that helps you remember what this rule does")
-                        .font(DesignSystem.bodyText)
-                        .foregroundColor(DesignSystem.secondaryBlue)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                }
-            }
-            .padding(.horizontal, DesignSystem.spacingXXL)
+            // Add top spacing to move input lower
+            Spacer()
+                .frame(height: 60)
             
             // Input Section
             VStack(alignment: .leading, spacing: DesignSystem.spacingL) {
                 VStack(alignment: .leading, spacing: DesignSystem.spacingS) {
-                    Text("Rule Name")
+                    Text("Space Name")
                         .font(DesignSystem.headingSmall)
                         .foregroundColor(DesignSystem.pureBlack)
                     
@@ -66,40 +46,10 @@ struct RuleNameStepView: View {
                         .transition(.opacity)
                 }
             }
-                            .padding(.horizontal, DesignSystem.spacingXL)
+            .createRuleCard()
             
-            Spacer()
-            
-            // Continue Button
-            Button(action: validateAndProceed) {
-                HStack(spacing: DesignSystem.spacingM) {
-                    Text("Continue")
-                        .font(DesignSystem.bodyText)
-                        .fontWeight(.semibold)
-                        .foregroundColor(DesignSystem.pureBlack)
-                    
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(DesignSystem.pureBlack)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: DesignSystem.buttonHeight)
-                .background(
-                    RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
-                        .fill(ruleName.isEmpty ? DesignSystem.secondaryBlue.opacity(0.3) : DesignSystem.primaryYellow)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
-                        .stroke(ruleName.isEmpty ? .clear : DesignSystem.secondaryBlue, lineWidth: DesignSystem.borderWidth)
-                )
-            }
-            .disabled(ruleName.isEmpty)
-            .scaleEffect(ruleName.isEmpty ? 0.98 : 1.0)
-            .animation(.easeInOut(duration: 0.2), value: ruleName.isEmpty)
-            .padding(.horizontal, DesignSystem.spacingXL)
-            .padding(.bottom, DesignSystem.spacingXXL)
+
         }
-        .background(DesignSystem.backgroundYellow)
         .onAppear {
             // Auto-focus the text field when view appears
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

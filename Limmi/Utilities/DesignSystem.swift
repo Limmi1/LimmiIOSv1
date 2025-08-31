@@ -42,6 +42,13 @@ public struct DesignSystem {
     public static let homepageCardBackground = pureWhite
     public static let homepageCardBorder = secondaryBlue.opacity(0.3)
     
+    /// Create Rule Flow specific colors for consistency
+    public static let createRuleBackground = homepageBackground
+    public static let createRuleCardBackground = homepageCardBackground
+    public static let createRuleCardBorder = homepageCardBorder
+    public static let createRuleTextPrimary = pureBlack
+    public static let createRuleTextSecondary = secondaryBlue
+    
     // MARK: - Typography
     
     /// Large heading - 24pt, bold weight
@@ -106,6 +113,9 @@ public struct DesignSystem {
         y: 1
     )
     
+    /// Create rule flow card shadow for consistency
+    public static let createRuleCardShadow = subtleShadow
+    
     /// Standard border width
     public static let borderWidth: CGFloat = 1
     
@@ -117,6 +127,26 @@ public struct DesignSystem {
     
     /// Card padding
     public static let cardPadding: CGFloat = 16
+    
+    /// Section header spacing for create rule flow
+    public static let sectionHeaderSpacing: CGFloat = 16
+    
+    /// Card content padding for create rule flow
+    public static let cardContentPadding: CGFloat = 16
+    
+    /// Card external padding for create rule flow
+    public static let cardExternalPadding: CGFloat = 24
+    
+    /// Rule card meta text sizing for consistent display
+    public static let ruleCardMetaTextSize: CGFloat = 11
+    public static let ruleCardMetaIconSize: CGFloat = 10
+    public static let ruleCardMetaSpacing: CGFloat = 2
+    
+    /// Get the most relevant emoji for a rule based on the space name
+    public static func getRelevantEmoji(for spaceName: String) -> String {
+        // Return a simple shield emoji for now to avoid any emoji-related issues
+        return "🛡️"
+    }
     
     // MARK: - Button Styles
     
@@ -247,5 +277,24 @@ extension View {
                     .stroke(DesignSystem.secondaryBlue, lineWidth: DesignSystem.borderWidth)
             )
             .cornerRadius(DesignSystem.cornerRadius)
+    }
+    
+    /// Apply create rule flow card styling for consistency
+    func createRuleCard() -> some View {
+        self
+            .padding(DesignSystem.cardContentPadding)
+            .background(DesignSystem.createRuleCardBackground)
+            .cornerRadius(DesignSystem.cornerRadius)
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                    .stroke(DesignSystem.createRuleCardBorder, lineWidth: DesignSystem.borderWidth)
+            )
+            .shadow(
+                color: DesignSystem.createRuleCardShadow.color,
+                radius: DesignSystem.createRuleCardShadow.radius,
+                x: DesignSystem.createRuleCardShadow.x,
+                y: DesignSystem.createRuleCardShadow.y
+            )
+            .padding(.horizontal, DesignSystem.cardExternalPadding)
     }
 }

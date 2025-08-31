@@ -13,11 +13,26 @@ struct ConfigurationView: View {
     @State private var showingBugReport = false
 
     var body: some View {
-        VStack {
-            NavigationView {
-                Form {
-                    Section(header: Text("Account")) {
-                        if let user = authViewModel.user {
+        NavigationView {
+            ScrollView {
+                LazyVStack(spacing: 24) {
+                    // Reduce top padding
+                    Color.clear
+                        .frame(height: 8)
+                                    // Account Section
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Text("Account")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(DesignSystem.pureBlack)
+                        Spacer()
+                    }
+                    
+                    Rectangle()
+                        .fill(DesignSystem.secondaryBlue.opacity(0.2))
+                        .frame(height: 1)
+                    
+                    if let user = authViewModel.user {
                             HStack {
                                 Image(systemName: "person.crop.circle")
                                     .resizable()
@@ -34,8 +49,10 @@ struct ConfigurationView: View {
                                         .foregroundColor(.secondary)
                                         .textSelection(.enabled)
                                 }
+                                Spacer()
                             }
                             .padding(.vertical, 4)
+                            
                             Button(role: .destructive) {
                                 showLogoutAlert = true
                             } label: {
@@ -57,6 +74,19 @@ struct ConfigurationView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                    .padding(16)
+                    .background(DesignSystem.homepageCardBackground)
+                    .cornerRadius(DesignSystem.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+                    )
+                    .shadow(
+                        color: DesignSystem.subtleShadow.color,
+                        radius: DesignSystem.subtleShadow.radius,
+                        x: DesignSystem.subtleShadow.x,
+                        y: DesignSystem.subtleShadow.y
+                    )
                     /*Section(header: Text("App Settings")) {
                         HStack {
                             Image(systemName: "gear")
@@ -68,7 +98,19 @@ struct ConfigurationView: View {
                         }
                     }*/
                     
-                    Section(header: Text("Rule Processing Strategy")) {
+                    // Rule Processing Strategy Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("Rule Processing Strategy")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(DesignSystem.pureBlack)
+                            Spacer()
+                        }
+                        
+                        Rectangle()
+                            .fill(DesignSystem.secondaryBlue.opacity(0.2))
+                            .frame(height: 1)
+                        
                         VStack(alignment: .leading, spacing: 12) {
                             Picker("Strategy Type", selection: $appSettings.ruleProcessingStrategy) {
                                 ForEach(RuleProcessingStrategyType.allCases) { strategy in
@@ -81,30 +123,22 @@ struct ConfigurationView: View {
                             Text(appSettings.ruleProcessingStrategy.description)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            
-                            /*if !appSettings.ruleProcessingStrategy.recommendedFor.isEmpty {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Recommended for:")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.secondary)
-                                    
-                                    ForEach(appSettings.ruleProcessingStrategy.recommendedFor, id: \.self) { useCase in
-                                        HStack {
-                                            Image(systemName: "circle.fill")
-                                                .font(.system(size: 4))
-                                                .foregroundColor(.secondary)
-                                            Text(useCase)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                            }*/
                         }
                         .padding(.vertical, 4)
-                        
                     }
+                    .padding(16)
+                    .background(DesignSystem.homepageCardBackground)
+                    .cornerRadius(DesignSystem.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+                    )
+                    .shadow(
+                        color: DesignSystem.subtleShadow.color,
+                        radius: DesignSystem.subtleShadow.radius,
+                        x: DesignSystem.subtleShadow.x,
+                        y: DesignSystem.subtleShadow.y
+                    )
                     /*
                     Section(header: Text("Advanced Settings")) {
                         Toggle(isOn: $appSettings.enableDetailedLogging) {
@@ -123,7 +157,19 @@ struct ConfigurationView: View {
                             }
                         }
                     }*/
-                    Section(header: Text("Support")) {
+                    // Support Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("Support")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(DesignSystem.pureBlack)
+                            Spacer()
+                        }
+                        
+                        Rectangle()
+                            .fill(DesignSystem.secondaryBlue.opacity(0.2))
+                            .frame(height: 1)
+                        
                         Button(action: {
                             showingBugReport = true
                         }) {
@@ -143,36 +189,70 @@ struct ConfigurationView: View {
                         }
                         .contentShape(Rectangle())
                         .buttonStyle(PlainButtonStyle())
-                        
-                        /*Button("Share App Log File") {
-                            shareLogFile()
-                        }
-                        .accessibilityLabel("Share the application log file")*/
                     }
-                    Section(header: Text("Diagnostics")) {
+                    .padding(16)
+                    .background(DesignSystem.homepageCardBackground)
+                    .cornerRadius(DesignSystem.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+                    )
+                    .shadow(
+                        color: DesignSystem.subtleShadow.color,
+                        radius: DesignSystem.subtleShadow.radius,
+                        x: DesignSystem.subtleShadow.x,
+                        y: DesignSystem.subtleShadow.y
+                    )
+                    // Diagnostics Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("Diagnostics")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(DesignSystem.pureBlack)
+                            Spacer()
+                        }
+                        
+                        Rectangle()
+                            .fill(DesignSystem.secondaryBlue.opacity(0.2))
+                            .frame(height: 1)
+                        
                         NavigationLink(destination: BeaconLogView()) {
                             Label("Beacon RSSI & Event Log", systemImage: "waveform.path.ecg")
                         }
-                        
                     }
+                    .padding(16)
+                    .background(DesignSystem.homepageCardBackground)
+                    .cornerRadius(DesignSystem.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+                    )
+                    .shadow(
+                        color: DesignSystem.subtleShadow.color,
+                        radius: DesignSystem.subtleShadow.radius,
+                        x: DesignSystem.subtleShadow.x,
+                        y: DesignSystem.subtleShadow.y
+                    )
                 }
-                .navigationTitle("Configuration")
+                .padding(.horizontal, 16)
+                .padding(.vertical, 20)
             }
-        }
-        .sheet(isPresented: $showShareSheet) {
-            if let provider = logFileProvider {
-                ShareSheet(activityItems: [provider])
+            .background(DesignSystem.homepageBackground)
+            .sheet(isPresented: $showShareSheet) {
+                if let provider = logFileProvider {
+                    ShareSheet(activityItems: [provider])
+                }
             }
+            .sheet(isPresented: $showingBugReport) {
+                BugReportFormView(authViewModel: authViewModel)
+            }
+            .alert("No log file available", isPresented: $showNoLogAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("There is no log file to share yet.")
+            }
+            .trackScreen("Settings", screenClass: "ConfigurationView")
         }
-        .sheet(isPresented: $showingBugReport) {
-            BugReportFormView(authViewModel: authViewModel)
-        }
-        .alert("No log file available", isPresented: $showNoLogAlert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("There is no log file to share yet.")
-        }
-        .trackScreen("Settings", screenClass: "ConfigurationView")
     }
 
     private func shareLogFile() {
@@ -256,7 +336,6 @@ struct ConfigurationView: View {
             return nil
         }
     }
-    
 }
 
 struct ShareSheet: UIViewControllerRepresentable {
