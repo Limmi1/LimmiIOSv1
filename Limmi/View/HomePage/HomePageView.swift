@@ -70,6 +70,8 @@ struct HomePageViewContent: View {
     @State private var showingBugReport = false
     @State private var showingRuleCreation = false
     @State private var ruleCreationMode: RuleCreationMode = .blocked
+    @State private var showingDeleteAlert = false
+    @State private var ruleToDelete: Rule?
     
     // Explicit initializer for all properties
     init(
@@ -80,6 +82,13 @@ struct HomePageViewContent: View {
         self._selectedTab = selectedTab
         self._logTapCount = logTapCount
         self._showLogSheet = showLogSheet
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func deleteRule(_ rule: Rule) {
+        ruleToDelete = rule
+        showingDeleteAlert = true
     }
     
     private var appColor = AppColor.shared
@@ -238,10 +247,17 @@ struct HomePageViewContent: View {
                                     .padding(.horizontal, DesignSystem.spacingXXL)
                                     .padding(.vertical, DesignSystem.spacingXXL)
                                 } else {
-                                    // Rules List
+                                    // Rules List with Swipe to Delete
                                     LazyVStack(spacing: DesignSystem.spacingM) {
                                         ForEach(ruleStoreViewModel.activeRules) { rule in
                                             RuleCard(rule: rule)
+                                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                                    Button(role: .destructive) {
+                                                        deleteRule(rule)
+                                                    } label: {
+                                                        Label("Delete", systemImage: "trash")
+                                                    }
+                                                }
                                         }
                                     }
                                     .padding(.horizontal, DesignSystem.spacingL)
@@ -311,6 +327,26 @@ struct HomePageViewContent: View {
         .onReceive(NotificationCenter.default.publisher(for: .didModifyRules)) { _ in
             // Phase 3: Refresh rule data via BlockingEngine
             blockingEngineViewModel.refreshRules()
+        }
+        .alert("Delete Rule", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let rule = ruleToDelete {
+                    ruleStoreViewModel.deleteRule(id: rule.id ?? "") { result in
+                        switch result {
+                        case .success:
+                            // Rule deleted successfully
+                            break
+                        case .failure(let error):
+                            print("Failed to delete rule: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        } message: {
+            if let rule = ruleToDelete {
+                Text("Are you sure you want to delete '\(rule.name)'? This action cannot be undone.")
+            }
         }
         .onChange(of: selectedTab) { oldTab, newTab in
             // Track tab switching for analytics
