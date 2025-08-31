@@ -17,13 +17,16 @@ struct RuleCreationFlowView: View {
     @State private var isCreatingRule = false
     @State private var creationError: String?
     
+    // Pre-determined blocking mode from the button clicked
+    let ruleCreationMode: RuleCreationMode
+    
     private let flowLogger = UnifiedLogger(
         fileLogger: .shared,
         osLogger: Logger(subsystem: "com.limmi.app", category: "RuleCreationFlow")
     )
     
-    init(authViewModel: AuthViewModel) {
-        
+    init(ruleCreationMode: RuleCreationMode) {
+        self.ruleCreationMode = ruleCreationMode
     }
     
     var body: some View {
@@ -58,31 +61,39 @@ struct RuleCreationFlowView: View {
                         selectedTokens: $selectedTokens,
                         onNext: { createRule() },
                         onBack: { moveToPreviousStep() },
-                        isCreating: isCreatingRule
+                        isCreating: isCreatingRule,
+                        ruleCreationMode: ruleCreationMode
                     )
                     .tag(RuleCreationStep.apps)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .disabled(isCreatingRule)
             }
+            .background(DesignSystem.backgroundYellow)
             .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(ruleCreationMode.title)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if currentStep == .name {
                         Button("Cancel") {
                             dismiss()
                         }
+                        .font(DesignSystem.bodyText)
+                        .foregroundColor(DesignSystem.secondaryBlue)
                         .disabled(isCreatingRule)
                     } else {
                         Button(action: {
                             hideKeyboard()
                             moveToPreviousStep()
                         }) {
-                            HStack(spacing: 4) {
+                            HStack(spacing: DesignSystem.spacingXS) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(DesignSystem.secondaryBlue)
                                 Text("Back")
-                                    .font(.system(size: 16, weight: .medium))
+                                    .font(DesignSystem.bodyText)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(DesignSystem.secondaryBlue)
                             }
                         }
                         .disabled(isCreatingRule)
@@ -93,10 +104,13 @@ struct RuleCreationFlowView: View {
                     if isCreatingRule {
                         ProgressView()
                             .scaleEffect(0.8)
+                            .progressViewStyle(CircularProgressViewStyle(tint: DesignSystem.primaryYellow))
                     } else if currentStep == .name {
                         Button("Cancel") {
                             dismiss()
                         }
+                        .font(DesignSystem.bodyText)
+                        .foregroundColor(DesignSystem.secondaryBlue)
                     }
                 }
             }
@@ -153,7 +167,8 @@ struct RuleCreationFlowView: View {
             name: ruleName,
             beacon: beacon,
             gpsLocation: gpsLocation,
-            blockedTokens: selectedTokens
+            blockedTokens: selectedTokens,
+            isBlockingEnabled: ruleCreationMode.isBlockingEnabled
         ) { result in
             DispatchQueue.main.async {
                 self.isCreatingRule = false
@@ -236,36 +251,36 @@ struct ProgressHeaderView: View {
     let currentStep: RuleCreationStep
     
     var body: some View {
-        VStack(spacing: 16) {
+                    VStack(spacing: DesignSystem.spacingL) {
             // Progress Indicator
-            HStack(spacing: 8) {
+            HStack(spacing: DesignSystem.spacingS) {
                 ForEach(RuleCreationStep.allCases, id: \.rawValue) { step in
                     Circle()
-                        .fill(step.rawValue <= currentStep.rawValue ? .blue : .gray.opacity(0.3))
+                        .fill(step.rawValue <= currentStep.rawValue ? DesignSystem.primaryYellow : DesignSystem.secondaryBlue.opacity(0.3))
                         .frame(width: 8, height: 8)
                         .scaleEffect(step == currentStep ? 1.2 : 1.0)
                         .animation(.easeInOut(duration: 0.2), value: currentStep)
                 }
             }
-            .padding(.top, 8)
+            .padding(.top, DesignSystem.spacingS)
             
             // Step Title
-            VStack(spacing: 4) {
+            VStack(spacing: DesignSystem.spacingXS) {
                 Text(currentStep.title)
-                    .font(.title2)
+                    .font(DesignSystem.headingMedium)
                     .fontWeight(.bold)
-                    .foregroundColor(.primary)
+                    .foregroundColor(DesignSystem.pureBlack)
                 
                 Text(currentStep.subtitle)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(DesignSystem.bodyTextSmall)
+                    .foregroundColor(DesignSystem.secondaryBlue)
             }
             .animation(.easeInOut(duration: 0.3), value: currentStep)
         }
-        .padding(.horizontal, 24)
-        .padding(.bottom, 24)
+        .padding(.horizontal, DesignSystem.spacingXL)
+        .padding(.bottom, DesignSystem.spacingXL)
         .frame(maxWidth: .infinity)
-        .background(Color(.systemGroupedBackground))
+        .background(DesignSystem.backgroundYellow)
     }
 }
 
@@ -278,7 +293,7 @@ struct RuleCreationFlowView_Previews: PreviewProvider {
             userId: "preview-user-id"
         )
         let ruleStoreViewModel = RuleStoreViewModel(ruleStore: firebaseRuleStore)
-        RuleCreationFlowView(authViewModel: authViewModel)
+        RuleCreationFlowView(ruleCreationMode: .blocked)
             .environmentObject(authViewModel)
             .environmentObject(ruleStoreViewModel)
     }

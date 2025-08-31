@@ -24,8 +24,9 @@ struct Rule: Identifiable, Codable {
     var gpsLocation: GPSLocation           // One GPS location
     var fineLocationRules: [FineLocationRule]  // Many BLE beacon rules
     var blockedTokenIds: [String]          // Reference to BlockedTokenInfo IDs
+    var isBlockingEnabled: Bool            // Whether this rule blocks or allows apps
     
-    init(name: String) {
+    init(name: String, isBlockingEnabled: Bool = true) {
         self.name = name
         self.isActive = true
         self.dateCreated = Date()
@@ -34,6 +35,7 @@ struct Rule: Identifiable, Codable {
         self.gpsLocation = GPSLocation()
         self.fineLocationRules = []
         self.blockedTokenIds = []
+        self.isBlockingEnabled = isBlockingEnabled
     }
     
     /// Checks if this rule is equivalent to another rule, ignoring timestamps and IDs
@@ -41,6 +43,7 @@ struct Rule: Identifiable, Codable {
     func isEquivalent(to other: Rule) -> Bool {
         return name == other.name &&
                isActive == other.isActive &&
+               isBlockingEnabled == other.isBlockingEnabled &&
                timeRules.isEquivalent(to: other.timeRules) &&
                gpsLocation.isEquivalent(to: other.gpsLocation) &&
                fineLocationRules.isEquivalent(to: other.fineLocationRules) &&
@@ -522,9 +525,10 @@ extension Rule {
         name: String,
         beaconId: String,
         gpsLocation: GPSLocation,
-        blockedTokenIds: [String]
+        blockedTokenIds: [String],
+        isBlockingEnabled: Bool
     ) -> Rule {
-        var rule = Rule(name: name)
+        var rule = Rule(name: name, isBlockingEnabled: isBlockingEnabled)
         rule.gpsLocation = gpsLocation
         rule.blockedTokenIds = blockedTokenIds
         
@@ -532,7 +536,7 @@ extension Rule {
         let fineLocationRule = FineLocationRule(
             name: "Beacon Rule for \(name)",
             beaconId: beaconId,
-            behaviorType: .allowedIn
+            behaviorType: isBlockingEnabled ? .blockedIn : .allowedIn
         )
         rule.fineLocationRules = [fineLocationRule]
         

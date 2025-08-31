@@ -8,6 +8,7 @@ struct AppSelectionStepView: View {
     let onNext: () -> Void
     let onBack: () -> Void
     let isCreating: Bool
+    let ruleCreationMode: RuleCreationMode
     
     @State private var showingAppValidation = false
     @State private var showingAppPicker = false
@@ -27,13 +28,15 @@ struct AppSelectionStepView: View {
                         .animation(.easeInOut(duration: 0.3), value: selectedTokens.isEmpty)
                         
                         VStack(spacing: 8) {
-                            Text("Select apps to block")
+                            Text(ruleCreationMode.isBlockingEnabled ? "Select apps to block" : "Select apps to allow")
                                 .font(.title2)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.primary)
                                 .multilineTextAlignment(.center)
                             
-                            Text("Choose which apps, categories, or websites should be blocked when you're not near the beacon")
+                            Text(ruleCreationMode.isBlockingEnabled ? 
+                                "Choose which apps, categories, or websites should be blocked when you're not near the beacon" :
+                                "Choose which apps, categories, or websites should be allowed when you're near the beacon")
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
@@ -361,7 +364,8 @@ struct AppSelectionStepView_Previews: PreviewProvider {
             selectedTokens: .constant([]),
             onNext: { },
             onBack: { },
-            isCreating: false
+            isCreating: false,
+            ruleCreationMode: .blocked
         )
     }
 }

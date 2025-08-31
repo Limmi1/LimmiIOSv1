@@ -4,6 +4,30 @@ import os
 import Combine
 import FirebaseFirestore
 
+// MARK: - Rule Creation Mode
+enum RuleCreationMode {
+    case blocked
+    case allowed
+    
+    var title: String {
+        switch self {
+        case .blocked:
+            return "Create Blocked Space"
+        case .allowed:
+            return "Create Allowed Space"
+        }
+    }
+    
+    var isBlockingEnabled: Bool {
+        switch self {
+        case .blocked:
+            return true
+        case .allowed:
+            return false
+        }
+    }
+}
+
 struct HomePageView: View {
     @EnvironmentObject var ruleStoreViewModel: RuleStoreViewModel
     @EnvironmentObject var blockingEngineViewModel: BlockingEngineViewModel
@@ -44,6 +68,8 @@ struct HomePageViewContent: View {
     @Binding var logTapCount: Int
     @Binding var showLogSheet: Bool
     @State private var showingBugReport = false
+    @State private var showingRuleCreation = false
+    @State private var ruleCreationMode: RuleCreationMode = .blocked
     
     // Explicit initializer for all properties
     init(
@@ -71,13 +97,13 @@ struct HomePageViewContent: View {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Limmi")
-                                    .font(.largeTitle)
+                                    .font(DesignSystem.headingLarge)
                                     .fontWeight(.bold)
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(DesignSystem.pureBlack)
                                 
                                 Text("Smart App Blocking")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .font(DesignSystem.bodyTextSmall)
+                                    .foregroundColor(DesignSystem.secondaryBlue)
                             }
                             
                             Spacer()
@@ -89,64 +115,153 @@ struct HomePageViewContent: View {
                                     .frame(width: 8, height: 8)
                                 
                                 Text(blockingEngineViewModel.isActive ? "Active" : "Inactive")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .font(DesignSystem.captionText)
+                                    .foregroundColor(DesignSystem.secondaryBlue)
                             }
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 8)
+                        .padding(.horizontal, DesignSystem.spacingL)
+                        .padding(.top, DesignSystem.spacingS)
                     }
                     
-                    // Rules Content
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            if $ruleStoreViewModel.activeRules.isEmpty {
-                                // Empty State - Only shown when data has actually loaded
-                                VStack(spacing: 20) {
-                                    Image(systemName: "shield.lefthalf.filled")
-                                        .font(.system(size: 64))
-                                        .foregroundColor(.blue.opacity(0.6))
-                                    
-                                    VStack(spacing: 8) {
-                                        Text("No Rules Yet")
-                                            .font(.title2)
-                                            .fontWeight(.semibold)
-                                        
-                                        Text("Create your first rule to start blocking apps based on location and time")
-                                            .font(.body)
-                                            .foregroundColor(.secondary)
-                                            .multilineTextAlignment(.center)
-                                            .lineLimit(3)
-                                    }
-                                    
-                                    CreateRuleButton()
-                                }
-                                .padding(.horizontal, 32)
-                                .padding(.vertical, 40)
-                            } else {
-                                // Rules List
-                                LazyVStack(spacing: 12) {
-                                    ForEach(ruleStoreViewModel.activeRules) { rule in
-                                        RuleCard(rule: rule)
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                                
-                                // Add Rule Button for existing rules
-                                CreateRuleButton()
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 8)
-                            }
+                    // New Spaces Section
+                    VStack(spacing: DesignSystem.spacingL) {
+                        // Section Header
+                        HStack {
+                            Text("New Spaces")
+                                .font(DesignSystem.headingMedium)
+                                .fontWeight(.semibold)
+                                .foregroundColor(DesignSystem.pureBlack)
+                            Spacer()
                         }
+                        .padding(.horizontal, DesignSystem.spacingL)
                         
-                        Spacer(minLength: 20)
+                        // New Space Buttons
+                        HStack(spacing: DesignSystem.spacingM) {
+                            // Create Blocked Space Button
+                            Button(action: {
+                                ruleCreationMode = .blocked
+                                showingRuleCreation = true
+                            }) {
+                                VStack(spacing: DesignSystem.spacingS) {
+                                    Image(systemName: "shield.lefthalf.filled")
+                                        .font(.system(size: 32))
+                                        .foregroundColor(.white)
+                                    
+                                    Text("Create Blocked Space")
+                                        .font(DesignSystem.bodyText)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.center)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 120)
+                                .background(DesignSystem.mutedRed)
+                                .cornerRadius(DesignSystem.cornerRadius)
+                                .shadow(
+                                    color: DesignSystem.cardShadow.color,
+                                    radius: DesignSystem.cardShadow.radius,
+                                    x: DesignSystem.cardShadow.x,
+                                    y: DesignSystem.cardShadow.y
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            // Create Allowed Space Button
+                            Button(action: {
+                                ruleCreationMode = .allowed
+                                showingRuleCreation = true
+                            }) {
+                                VStack(spacing: DesignSystem.spacingS) {
+                                    Image(systemName: "checkmark.shield.fill")
+                                        .font(.system(size: 32))
+                                        .foregroundColor(.white)
+                                    
+                                    Text("Create Allowed Space")
+                                        .font(DesignSystem.bodyText)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.center)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 120)
+                                .background(DesignSystem.mutedGreen)
+                                .cornerRadius(DesignSystem.cornerRadius)
+                                .shadow(
+                                    color: DesignSystem.cardShadow.color,
+                                    radius: DesignSystem.cardShadow.radius,
+                                    x: DesignSystem.cardShadow.x,
+                                    y: DesignSystem.cardShadow.y
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .padding(.horizontal, DesignSystem.spacingL)
                     }
+                    .padding(.vertical, DesignSystem.spacingL)
+                    .background(DesignSystem.pureWhite.opacity(0.5))
+                    
+                    // Existing Spaces Section
+                    VStack(spacing: DesignSystem.spacingL) {
+                        // Section Header
+                        HStack {
+                            Text("Existing Spaces")
+                                .font(DesignSystem.headingMedium)
+                                .fontWeight(.semibold)
+                                .foregroundColor(DesignSystem.pureBlack)
+                            Spacer()
+                        }
+                        .padding(.horizontal, DesignSystem.spacingL)
+                        
+                        // Rules Content
+                        ScrollView {
+                            VStack(spacing: DesignSystem.spacingL) {
+                                if $ruleStoreViewModel.activeRules.isEmpty {
+                                    // Empty State - Only shown when data has actually loaded
+                                    VStack(spacing: DesignSystem.spacingXL) {
+                                        Image(systemName: "shield.lefthalf.filled")
+                                            .font(.system(size: 64))
+                                            .foregroundColor(DesignSystem.secondaryBlue.opacity(0.6))
+                                        
+                                        VStack(spacing: DesignSystem.spacingS) {
+                                            Text("No Spaces Yet")
+                                                .font(DesignSystem.headingMedium)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(DesignSystem.pureBlack)
+                                            
+                                            Text("Create your first space to start managing apps based on location and time")
+                                                .font(DesignSystem.bodyText)
+                                                .foregroundColor(DesignSystem.secondaryBlue)
+                                                .multilineTextAlignment(.center)
+                                                .lineLimit(3)
+                                        }
+                                    }
+                                    .padding(.horizontal, DesignSystem.spacingXXL)
+                                    .padding(.vertical, DesignSystem.spacingXXL)
+                                } else {
+                                    // Rules List
+                                    LazyVStack(spacing: DesignSystem.spacingM) {
+                                        ForEach(ruleStoreViewModel.activeRules) { rule in
+                                            RuleCard(rule: rule)
+                                        }
+                                    }
+                                    .padding(.horizontal, DesignSystem.spacingL)
+                                }
+                            }
+                            
+                            Spacer(minLength: DesignSystem.spacingXL)
+                        }
+                    }
+                    .padding(.vertical, DesignSystem.spacingL)
+                    .background(DesignSystem.backgroundYellow.opacity(0.8))
                 }
-                .background(Color(.systemGroupedBackground))
+                .background(DesignSystem.backgroundYellow.opacity(0.8))
+                .sheet(isPresented: $showingRuleCreation) {
+                    RuleCreationFlowView(ruleCreationMode: ruleCreationMode)
+                }
             }
             .tabItem {
                 Image(systemName: "shield.lefthalf.filled")
-                Text("Rules")
+                Text("Spaces")
             }
             .tag(0)
             

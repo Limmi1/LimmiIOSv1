@@ -227,12 +227,14 @@ class RuleStoreViewModel: ObservableObject {
     ///   - beacon: Beacon device (with or without ID)
     ///   - gpsLocation: GPS location settings
     ///   - blockedTokens: Screen Time tokens (apps, web domains, activity categories)
+    ///   - isBlockingEnabled: Whether this rule blocks or allows apps
     ///   - completion: Completion handler with created rule or error
     func createComplexRule(
         name: String,
         beacon: BeaconDevice,
         gpsLocation: GPSLocation,
         blockedTokens: [BlockedToken],
+        isBlockingEnabled: Bool,
         completion: @escaping (Result<Rule, Error>) -> Void
     ) {
         logger.debug("Starting complex rule creation: \(name)")
@@ -253,6 +255,7 @@ class RuleStoreViewModel: ObservableObject {
                             beaconId: beaconId,
                             gpsLocation: gpsLocation,
                             blockedTokenIds: blockedTokenIds,
+                            isBlockingEnabled: isBlockingEnabled,
                             completion: completion
                         )
                     case .failure(let error):
@@ -335,6 +338,7 @@ class RuleStoreViewModel: ObservableObject {
         beaconId: String,
         gpsLocation: GPSLocation,
         blockedTokenIds: [String],
+        isBlockingEnabled: Bool,
         completion: @escaping (Result<Rule, Error>) -> Void
     ) {
         logger.debug("Creating rule with components: beacon=\(beaconId), tokens=\(blockedTokenIds.count)")
@@ -344,7 +348,8 @@ class RuleStoreViewModel: ObservableObject {
             name: name,
             beaconId: beaconId,
             gpsLocation: gpsLocation,
-            blockedTokenIds: blockedTokenIds
+            blockedTokenIds: blockedTokenIds,
+            isBlockingEnabled: isBlockingEnabled
         )
         
         // Save the complete rule

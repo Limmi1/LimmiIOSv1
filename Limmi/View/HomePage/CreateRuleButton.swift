@@ -10,33 +10,38 @@ struct CreateRuleButton: View {
         Button(action: {
             showingRuleCreation = true
         }) {
-            HStack(spacing: 12) {
+            HStack(spacing: DesignSystem.spacingM) {
                 Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
+                    .font(DesignSystem.bodyText)
+                    .fontWeight(.semibold)
+                    .foregroundColor(DesignSystem.pureBlack)
                 
                 Text("Create New Rule")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
+                    .font(DesignSystem.bodyText)
+                    .fontWeight(.semibold)
+                    .foregroundColor(DesignSystem.pureBlack)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [.blue, .blue.opacity(0.8)]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+            .frame(height: DesignSystem.buttonHeight)
+            .background(DesignSystem.primaryYellow)
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                    .stroke(DesignSystem.secondaryBlue, lineWidth: DesignSystem.borderWidth)
             )
-            .cornerRadius(12)
-            .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
+            .cornerRadius(DesignSystem.cornerRadius)
+            .shadow(
+                color: DesignSystem.cardShadow.color,
+                radius: DesignSystem.cardShadow.radius,
+                x: DesignSystem.cardShadow.x,
+                y: DesignSystem.cardShadow.y
+            )
         }
         .buttonStyle(PlainButtonStyle())
         .scaleEffect(showingRuleCreation ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: showingRuleCreation)
         .sheet(isPresented: $showingRuleCreation,
                onDismiss: { NotificationCenter.default.post(name: .didModifyRules, object: nil) }) {
-            RuleCreationFlowView(authViewModel: authViewModel)
+            RuleCreationFlowView(ruleCreationMode: .blocked)
                 .environmentObject(authViewModel)
                 .environmentObject(ruleStoreViewModel)
         }
