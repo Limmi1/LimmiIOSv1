@@ -104,16 +104,11 @@ struct HomePageViewContent: View {
                     // Header
                     VStack(spacing: 16) {
                         HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Limmi")
-                                    .font(DesignSystem.headingLarge)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(DesignSystem.pureBlack)
-                                
-                                Text("Smart App Blocking")
-                                    .font(DesignSystem.bodyTextSmall)
-                                    .foregroundColor(DesignSystem.secondaryBlue)
-                            }
+                            // Logo
+                            Image("yellowbrainblacklinedots copy")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 40)
                             
                             Spacer()
                             

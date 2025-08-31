@@ -76,7 +76,7 @@ struct RuleCard: View {
                             .font(.system(size: 12))
                             .foregroundColor(DesignSystem.secondaryBlue)
                         
-                        Text("\(Int(rule.gpsLocation.radius)) m radius")
+                        Text("\(Int(rule.gpsLocation.radius)) m")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(DesignSystem.secondaryBlue)
                     }
