@@ -34,6 +34,14 @@ public struct DesignSystem {
     /// Muted green for allowed/permitted actions
     public static let mutedGreen = Color(hex: "4A7C59")
     
+    /// Homepage accent colors for consistent styling
+    public static let homepageRed = mutedRed
+    public static let homepageGreen = mutedGreen
+    public static let homepageBlue = secondaryBlue
+    public static let homepageBackground = subtleYellowBackground
+    public static let homepageCardBackground = pureWhite
+    public static let homepageCardBorder = secondaryBlue.opacity(0.3)
+    
     // MARK: - Typography
     
     /// Large heading - 24pt, bold weight

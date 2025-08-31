@@ -45,7 +45,7 @@ struct RuleEditView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 20)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(DesignSystem.homepageBackground)
             .navigationTitle(formViewModel.formTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -203,8 +203,18 @@ struct RuleNameSection: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(DesignSystem.homepageCardBackground)
+        .cornerRadius(DesignSystem.cornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+        )
+        .shadow(
+            color: DesignSystem.subtleShadow.color,
+            radius: DesignSystem.subtleShadow.radius,
+            x: DesignSystem.subtleShadow.x,
+            y: DesignSystem.subtleShadow.y
+        )
     }
 }
 
@@ -224,8 +234,18 @@ struct RuleActiveSection: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(DesignSystem.homepageCardBackground)
+        .cornerRadius(DesignSystem.cornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+        )
+        .shadow(
+            color: DesignSystem.subtleShadow.color,
+            radius: DesignSystem.subtleShadow.radius,
+            x: DesignSystem.subtleShadow.x,
+            y: DesignSystem.subtleShadow.y
+        )
     }
 }
 
@@ -247,18 +267,18 @@ struct RuleConditionStatusSection: View {
                 HStack(spacing: 4) {
                     Image(systemName: conditionStatus.overallBlockingStatus ? "shield.fill" : "shield")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(conditionStatus.overallBlockingStatus ? .red : .green)
+                        .foregroundColor(conditionStatus.overallBlockingStatus ? DesignSystem.homepageRed : DesignSystem.homepageGreen)
                     
                     Text(conditionStatus.overallBlockingStatus ? "Blocking" : "Not Blocking")
                         .font(.subheadline)
                         .fontWeight(.medium)
-                        .foregroundColor(conditionStatus.overallBlockingStatus ? .red : .green)
+                        .foregroundColor(conditionStatus.overallBlockingStatus ? DesignSystem.homepageRed : DesignSystem.homepageGreen)
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(
                     RoundedRectangle(cornerRadius: 6)
-                        .fill((conditionStatus.overallBlockingStatus ? Color.red : Color.green).opacity(0.1))
+                        .fill((conditionStatus.overallBlockingStatus ? DesignSystem.homepageRed : DesignSystem.homepageGreen).opacity(0.1))
                 )
             }
             
@@ -280,8 +300,18 @@ struct RuleConditionStatusSection: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(DesignSystem.homepageCardBackground)
+        .cornerRadius(DesignSystem.cornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+        )
+        .shadow(
+            color: DesignSystem.subtleShadow.color,
+            radius: DesignSystem.subtleShadow.radius,
+            x: DesignSystem.subtleShadow.x,
+            y: DesignSystem.subtleShadow.y
+        )
     }
 }
 
@@ -405,8 +435,18 @@ struct GPSLocationSection: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(DesignSystem.homepageCardBackground)
+        .cornerRadius(DesignSystem.cornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+        )
+        .shadow(
+            color: DesignSystem.subtleShadow.color,
+            radius: DesignSystem.subtleShadow.radius,
+            x: DesignSystem.subtleShadow.x,
+            y: DesignSystem.subtleShadow.y
+        )
     }
 }
 
@@ -442,8 +482,18 @@ struct BeaconRulesSection: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(DesignSystem.homepageCardBackground)
+        .cornerRadius(DesignSystem.cornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+        )
+        .shadow(
+            color: DesignSystem.subtleShadow.color,
+            radius: DesignSystem.subtleShadow.radius,
+            x: DesignSystem.subtleShadow.x,
+            y: DesignSystem.subtleShadow.y
+        )
     }
 }
 
@@ -562,8 +612,18 @@ struct TimeRulesSection: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(DesignSystem.homepageCardBackground)
+        .cornerRadius(DesignSystem.cornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+        )
+        .shadow(
+            color: DesignSystem.subtleShadow.color,
+            radius: DesignSystem.subtleShadow.radius,
+            x: DesignSystem.subtleShadow.x,
+            y: DesignSystem.subtleShadow.y
+        )
     }
 }
 

@@ -104,12 +104,6 @@ struct HomePageViewContent: View {
                     // Header
                     VStack(spacing: 16) {
                         HStack {
-                            // Logo
-                            Image("yellowbrainblacklinedots copy")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: 40)
-                            
                             Spacer()
                             
                             // Status indicator
@@ -132,7 +126,7 @@ struct HomePageViewContent: View {
                         // Section Header with Divider
                         VStack(spacing: DesignSystem.spacingS) {
                             HStack {
-                                Text("New Spaces")
+                                Text("Create Spaces")
                                     .font(.system(size: 22, weight: .bold))
                                     .foregroundColor(DesignSystem.pureBlack)
                                 Spacer()
@@ -153,12 +147,13 @@ struct HomePageViewContent: View {
                                 showingRuleCreation = true
                             }) {
                                 VStack(spacing: DesignSystem.spacingS) {
-                                    Image(systemName: "shield.lefthalf.filled")
-                                        .font(.system(size: 32))
-                                        .foregroundColor(DesignSystem.mutedRed)
+                                    Image("blockedpsacelogo")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 64, height: 64)
                                     
-                                    Text("Create Blocked Space")
-                                        .font(.system(size: 18, weight: .semibold))
+                                    Text("Blocked Space")
+                                        .font(.system(size: 16, weight: .semibold))
                                         .foregroundColor(DesignSystem.mutedRed)
                                         .multilineTextAlignment(.center)
                                 }
@@ -185,12 +180,13 @@ struct HomePageViewContent: View {
                                 showingRuleCreation = true
                             }) {
                                 VStack(spacing: DesignSystem.spacingS) {
-                                    Image(systemName: "checkmark.shield.fill")
-                                        .font(.system(size: 32))
-                                        .foregroundColor(DesignSystem.mutedGreen)
+                                    Image("unblockspacelogo")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 64, height: 64)
                                     
-                                    Text("Create Allowed Space")
-                                        .font(.system(size: 18, weight: .semibold))
+                                    Text("Allowed Space")
+                                        .font(.system(size: 16, weight: .semibold))
                                         .foregroundColor(DesignSystem.mutedGreen)
                                         .multilineTextAlignment(.center)
                                 }
@@ -213,11 +209,11 @@ struct HomePageViewContent: View {
                         }
                         .padding(.horizontal, DesignSystem.spacingL)
                     }
-                    .padding(.vertical, DesignSystem.spacingL)
+                    .padding(.vertical, DesignSystem.spacingM)
                     
                     // Spacing between sections
                     Spacer()
-                        .frame(height: 20)
+                        .frame(height: 12)
                     
                     // Existing Spaces Section
                     VStack(spacing: DesignSystem.spacingL) {
@@ -277,6 +273,7 @@ struct HomePageViewContent: View {
                                         }
                                     }
                                     .padding(.horizontal, DesignSystem.spacingL)
+                                    .padding(.top, DesignSystem.spacingS)
                                 }
                             }
                             

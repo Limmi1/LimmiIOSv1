@@ -45,8 +45,18 @@ struct AppTokenSelectionView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(DesignSystem.homepageCardBackground)
+        .cornerRadius(DesignSystem.cornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+        )
+        .shadow(
+            color: DesignSystem.subtleShadow.color,
+            radius: DesignSystem.subtleShadow.radius,
+            x: DesignSystem.subtleShadow.x,
+            y: DesignSystem.subtleShadow.y
+        )
         .sheet(isPresented: $showingPicker) {
             AppPickerSheet(
                 selection: $familySelection,
