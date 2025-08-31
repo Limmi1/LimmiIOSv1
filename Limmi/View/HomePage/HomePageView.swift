@@ -289,7 +289,7 @@ struct HomePageViewContent: View {
                 }
             }
             .tabItem {
-                Image("spaceslogo")
+                Image(systemName: "house.circle")
                 Text("Spaces")
             }
             .tag(0)

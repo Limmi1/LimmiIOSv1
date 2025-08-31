@@ -217,8 +217,21 @@ struct ConfigurationView: View {
                             .frame(height: 1)
                         
                         NavigationLink(destination: BeaconLogView()) {
-                            Label("Beacon RSSI & Event Log", systemImage: "waveform.path.ecg")
+                            HStack {
+                                Image(systemName: "waveform.path.ecg")
+                                    .foregroundColor(.blue)
+                                
+                                Text("Beacon RSSI & Event Log")
+                                    .foregroundColor(.primary)
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                     .padding(16)
                     .background(DesignSystem.homepageCardBackground)
