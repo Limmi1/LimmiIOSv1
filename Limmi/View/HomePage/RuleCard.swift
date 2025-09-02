@@ -13,9 +13,29 @@ struct RuleCard: View {
         return blockingEngineViewModel.isRuleCurrentlyBlocking(rule)
     }
     
-    private var relevantEmoji: String {
-        // Get emoji based on the space name (rule name)
-        return DesignSystem.getRelevantEmoji(for: rule.name)
+    private var spaceTypeIndicator: (text: String, color: Color, icon: String) {
+        // Check if rule has any fine location rules to determine space type
+        let activeFineRules = rule.fineLocationRules.filter { $0.isActive }
+        
+        if activeFineRules.isEmpty {
+            // No beacon rules - default to blocked space
+            return ("Blocked Space", .red, "shield.fill")
+        }
+        
+        // Check if all active fine rules are of the same type
+        let hasAllowedIn = activeFineRules.contains { $0.behaviorType == .allowedIn }
+        let hasBlockedIn = activeFineRules.contains { $0.behaviorType == .blockedIn }
+        
+        if hasAllowedIn && !hasBlockedIn {
+            // All rules are allowedIn
+            return ("Allowed Space", .green, "checkmark.shield.fill")
+        } else if hasBlockedIn && !hasAllowedIn {
+            // All rules are blockedIn
+            return ("Blocked Space", .red, "shield.fill")
+        } else {
+            // Mixed rules - show as blocked space (more restrictive)
+            return ("Mixed Space", .orange, "exclamationmark.shield.fill")
+        }
     }
     
     var body: some View {
@@ -23,19 +43,31 @@ struct RuleCard: View {
             showingEditView = true
         }) {
             VStack(alignment: .leading, spacing: DesignSystem.spacingM) {
-                // Rule Header with Chevron
+                // Rule Header with Space Type Indicator and Chevron
                 HStack {
-                    HStack(spacing: 8) {
-                        Text(relevantEmoji)
-                            .font(.system(size: 20))
-                        
-                        Text(rule.name)
-                            .font(DesignSystem.headingSmall)
-                            .fontWeight(.semibold)
-                            .foregroundColor(DesignSystem.pureBlack)
-                    }
+                    Text(rule.name)
+                        .font(DesignSystem.headingSmall)
+                        .fontWeight(.semibold)
+                        .foregroundColor(DesignSystem.pureBlack)
                     
                     Spacer()
+                    
+                    // Space Type Indicator
+                    HStack(spacing: 4) {
+                        Image(systemName: spaceTypeIndicator.icon)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(spaceTypeIndicator.color)
+                        
+                        Text(spaceTypeIndicator.text)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(spaceTypeIndicator.color)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(spaceTypeIndicator.color.opacity(0.1))
+                    )
                     
                     // Chevron
                     Image(systemName: "chevron.right")

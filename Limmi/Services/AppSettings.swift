@@ -60,6 +60,28 @@ final class AppSettings: ObservableObject {
             UserDefaults.standard.set(enablePerformanceMonitoring, forKey: Keys.enablePerformanceMonitoring)
         }
     }
+
+    /// Enable App Lock requirement
+    @Published var enableAppLock: Bool {
+        didSet {
+            UserDefaults.standard.set(enableAppLock, forKey: Keys.enableAppLock)
+            // When toggled on, immediately require passcode if one exists; when off, unlock session
+            if enableAppLock {
+                if LockManager.shared.hasPasscode() {
+                    LockManager.shared.lock()
+                }
+            } else {
+                LockManager.shared.isLocked = false
+            }
+        }
+    }
+
+    /// Use Face ID / Touch ID for unlocking
+    @Published var useBiometrics: Bool {
+        didSet {
+            UserDefaults.standard.set(useBiometrics, forKey: Keys.useBiometrics)
+        }
+    }
     
     // MARK: - Private Keys
     
@@ -68,6 +90,8 @@ final class AppSettings: ObservableObject {
         static let strategyConfigurationLevel = "strategyConfigurationLevel"
         static let enableDetailedLogging = "enableDetailedLogging"
         static let enablePerformanceMonitoring = "enablePerformanceMonitoring"
+        static let enableAppLock = "enableAppLock"
+        static let useBiometrics = "useBiometrics"
     }
     
     // MARK: - Initialization
@@ -84,6 +108,8 @@ final class AppSettings: ObservableObject {
         // Load other settings
         self.enableDetailedLogging = UserDefaults.standard.bool(forKey: Keys.enableDetailedLogging)
         self.enablePerformanceMonitoring = UserDefaults.standard.bool(forKey: Keys.enablePerformanceMonitoring)
+        self.enableAppLock = UserDefaults.standard.bool(forKey: Keys.enableAppLock)
+        self.useBiometrics = UserDefaults.standard.bool(forKey: Keys.useBiometrics)
     }
     
     // MARK: - Computed Properties

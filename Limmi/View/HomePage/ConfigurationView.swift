@@ -6,6 +6,7 @@ struct ConfigurationView: View {
     @EnvironmentObject var blockingEngineViewModel: BlockingEngineViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var appSettings = AppSettings.shared
+    @ObservedObject private var lockManager = LockManager.shared
     @State private var showShareSheet = false
     @State private var showNoLogAlert = false
     @State private var logFileProvider: NSItemProvider? = nil
@@ -15,11 +16,17 @@ struct ConfigurationView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: 24) {
-                    // Reduce top padding
-                    Color.clear
-                        .frame(height: 8)
-                                    // Account Section
+                LazyVStack(spacing: 16) {
+                    // Small header to match HomePageView spacing
+                    VStack(spacing: DesignSystem.spacingS) {
+                        HStack { Spacer() }
+                        Rectangle()
+                            .fill(DesignSystem.secondaryBlue.opacity(0.1))
+                            .frame(height: 1)
+                    }
+                    .padding(.horizontal, DesignSystem.spacingL)
+                    .padding(.top, DesignSystem.spacingS)
+                    // Account Section
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
                         Text("Account")
@@ -73,6 +80,73 @@ struct ConfigurationView: View {
                             Text("Not signed in.")
                                 .foregroundColor(.secondary)
                         }
+                    }
+                    .padding(16)
+                    .background(DesignSystem.homepageCardBackground)
+                    .cornerRadius(DesignSystem.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(DesignSystem.homepageCardBorder, lineWidth: 1)
+                    )
+                    .shadow(
+                        color: DesignSystem.subtleShadow.color,
+                        radius: DesignSystem.subtleShadow.radius,
+                        x: DesignSystem.subtleShadow.x,
+                        y: DesignSystem.subtleShadow.y
+                    )
+                    
+                    // App Lock Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("App Lock")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(DesignSystem.pureBlack)
+                            Spacer()
+                        }
+
+                        Rectangle()
+                            .fill(DesignSystem.secondaryBlue.opacity(0.2))
+                            .frame(height: 1)
+
+                        Toggle(isOn: $appSettings.enableAppLock) {
+                            HStack {
+                                Image(systemName: "lock.fill")
+                                    .foregroundColor(.blue)
+                                Text("Require App Lock")
+                            }
+                        }
+
+                        // Face ID removed: biometrics toggle hidden
+
+                        // Passcode management is available even if App Lock is currently off
+                        NavigationLink(destination: SetPasscodeView()) {
+                            HStack {
+                                Image(systemName: "key.fill")
+                                    .foregroundColor(.orange)
+                                Text("Set / Change Passcode")
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+
+                        NavigationLink(destination: SetPasscodeView()) {
+                            HStack {
+                                Image(systemName: "key.slash")
+                                    .foregroundColor(.red)
+                                Text("Reset Passcode")
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .disabled(!lockManager.hasPasscode())
                     }
                     .padding(16)
                     .background(DesignSystem.homepageCardBackground)
@@ -248,7 +322,8 @@ struct ConfigurationView: View {
                     )
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 20)
+                .padding(.top, 8)
+                .padding(.bottom, 20)
             }
             .background(DesignSystem.homepageBackground)
             .sheet(isPresented: $showShareSheet) {

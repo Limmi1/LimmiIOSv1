@@ -18,5 +18,7 @@
 	<true/>
 	<key>FIRAnalyticsDebugEnabled</key>
 	<true/>
+    <key>NSFaceIDUsageDescription</key>
+    <string>Unlock Limmi using Face ID for faster and secure access.</string>
 </dict>
 </plist>

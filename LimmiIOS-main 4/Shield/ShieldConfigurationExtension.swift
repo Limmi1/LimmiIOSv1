@@ -37,7 +37,7 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
                 color: .label
             ),
             subtitle: ShieldConfiguration.Label(
-                text: "This app is currently blocked by your zone settings",
+                text: "You are being blocked in this space",
                 color: .secondaryLabel
             ),
             primaryButtonLabel: ShieldConfiguration.Label(

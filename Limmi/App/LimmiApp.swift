@@ -40,6 +40,7 @@ struct LimmiApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject var authViewModel = AuthViewModel()
     @StateObject var appSettings = AppSettings.shared
+    @StateObject private var lockManager = LockManager.shared
     
     // MARK: - Lifecycle Logging
     
@@ -77,19 +78,68 @@ struct LimmiApp: App {
         #if DEBUG
         DebugConfiguration.shared.loadFromEnvironment()
         #endif
+
+        // One-time forced unlock to allow user to reset passcode and re-enable App Lock
+        // Bump the version suffix to force a fresh unlock per request
+        let forceUnlockKey = "com.ah.limmi.app.forceUnlockOnce.v2"
+        if UserDefaults.standard.bool(forKey: forceUnlockKey) == false {
+            UserDefaults.standard.set(true, forKey: forceUnlockKey)
+            // Disable App Lock and clear Limmi passcode once
+            AppSettings.shared.enableAppLock = false
+            do { try LockManager.shared.setPasscode(nil) } catch { print("Failed to clear Limmi passcode: \(error)") }
+            LockManager.shared.isLocked = false
+            lifecycleLogger.debug("Forced unlock applied on first launch after update")
+        }
+
+        // No default passcode or forced deactivation at startup. User controls App Lock from Settings.
+
+        // Keep existing App Lock setting/state
     }
     
     // MARK: - Scene Configuration
     
     var body: some Scene {
         WindowGroup {
-            RootView()
+            ZStack {
+                RootView()
+                if appSettings.enableAppLock && lockManager.hasPasscode() && lockManager.isLocked {
+                    LockScreenView()
+                        .transition(.opacity)
+                }
+            }
                 .environmentObject(authViewModel)
                 .environmentObject(appSettings)
                 .environmentObject(HeartbeatEnvironment(manager: heartbeatManager, deviceActivityService: deviceActivityHeartbeatService))
+                .onAppear {
+                    // If no passcode exists, force-disable App Lock and unlock
+                    if !lockManager.hasPasscode() {
+                        appSettings.enableAppLock = false
+                        lockManager.isLocked = false
+                    } else if appSettings.enableAppLock {
+                        lockManager.lock()
+                    } else {
+                        lockManager.isLocked = false
+                    }
+                }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             logScenePhaseChange(from: oldPhase, to: newPhase)
+            if appSettings.enableAppLock {
+                switch newPhase {
+                case .active:
+                    // Require passcode every time app enters foreground if enabled
+                    if lockManager.hasPasscode() {
+                        lockManager.lock()
+                    }
+                case .inactive, .background:
+                    // Pre-emptively lock when leaving foreground
+                    if lockManager.hasPasscode() {
+                        lockManager.lock()
+                    }
+                @unknown default:
+                    break
+                }
+            }
         }
     }
     
@@ -494,7 +544,7 @@ struct LoadingView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Image("Limmi Logo Only (Transparent) copy")
+            Image("yellowbrainblacklinedots copy")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 120, height: 120)
@@ -588,6 +638,9 @@ struct LoadingView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(DesignSystem.homepageBackground)
+        .ignoresSafeArea()
         .onAppear {
             // Start spinning animation
             withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
