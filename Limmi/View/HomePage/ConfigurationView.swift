@@ -17,15 +17,6 @@ struct ConfigurationView: View {
         NavigationView {
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    // Small header to match HomePageView spacing
-                    VStack(spacing: DesignSystem.spacingS) {
-                        HStack { Spacer() }
-                        Rectangle()
-                            .fill(DesignSystem.secondaryBlue.opacity(0.1))
-                            .frame(height: 1)
-                    }
-                    .padding(.horizontal, DesignSystem.spacingL)
-                    .padding(.top, DesignSystem.spacingS)
                     // Account Section
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
@@ -133,20 +124,7 @@ struct ConfigurationView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
 
-                        NavigationLink(destination: SetPasscodeView()) {
-                            HStack {
-                                Image(systemName: "key.slash")
-                                    .foregroundColor(.red)
-                                Text("Reset Passcode")
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .disabled(!lockManager.hasPasscode())
+
                     }
                     .padding(16)
                     .background(DesignSystem.homepageCardBackground)

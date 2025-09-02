@@ -10,6 +10,7 @@ struct SetPasscodeView: View {
     @State private var successMessage: String?
     @State private var showSavedAlert: Bool = false
     @State private var showForceResetAlert: Bool = false
+
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -118,6 +119,7 @@ struct SetPasscodeView: View {
         } message: {
             Text("This will remove your Limmi passcode immediately. You can set a new one after.")
         }
+
         .onChange(of: passcode) { _, newValue in
             let filtered = newValue.filter { $0.isNumber }
             passcode = String(filtered.prefix(12))
