@@ -6,6 +6,9 @@ struct LoginView: View {
     @State private var password = ""
     @State private var showPassword = false
     @State private var mode: AuthMode = .login
+    @State private var legalAccepted = false
+    @State private var showLegalModal = false
+    @State private var legalModalType: LegalModalType = .betaAgreement
     @FocusState private var focusedField: Field?
     
     enum AuthMode: String, CaseIterable, Identifiable {
@@ -16,22 +19,26 @@ struct LoginView: View {
     enum Field: Hashable {
         case email, password
     }
+    
+    enum LegalModalType {
+        case betaAgreement
+        case privacyNotice
+    }
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
-            VStack(spacing: 32) {
+            DesignSystem.subtleYellowBackground.ignoresSafeArea()
+            VStack(spacing: DesignSystem.spacingXXL) {
                 Spacer()
                 // Logo or App Name
-                VStack(spacing: 8) {
-                    Image(systemName: "lock.shield")
+                VStack(spacing: DesignSystem.spacingS) {
+                    Image("yellowbrainblacklinedots copy 1")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 64, height: 64)
-                        .foregroundColor(.accentColor)
+                        .frame(width: 120, height: 120)
                     Text("Welcome to Limmi")
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .font(DesignSystem.headingLarge)
+                        .foregroundColor(DesignSystem.pureBlack)
                 }
                 // Mode Picker
                 Picker("Mode", selection: $mode) {
@@ -40,17 +47,26 @@ struct LoginView: View {
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
-                .padding(.horizontal)
+                .padding(.horizontal, DesignSystem.spacingXL)
                 // Input Fields
-                VStack(spacing: 16) {
+                VStack(spacing: DesignSystem.spacingL) {
                     TextField("Email", text: $email)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                         .textContentType(.emailAddress)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .font(DesignSystem.bodyText)
+                        .foregroundColor(DesignSystem.pureBlack)
+                        .padding(DesignSystem.spacingL)
+                        .background(DesignSystem.pureWhite)
+                        .cornerRadius(DesignSystem.cornerRadius)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                                .stroke(DesignSystem.secondaryBlue.opacity(0.3), lineWidth: DesignSystem.borderWidth)
+                        )
                         .focused($focusedField, equals: .email)
                         .submitLabel(.next)
                         .onSubmit { focusedField = .password }
+                    
                     HStack {
                         if showPassword {
                             TextField("Password", text: $password)
@@ -61,28 +77,84 @@ struct LoginView: View {
                         }
                         Button(action: { showPassword.toggle() }) {
                             Image(systemName: showPassword ? "eye.slash" : "eye")
-                                .foregroundColor(.gray)
+                                .foregroundColor(DesignSystem.secondaryBlue.opacity(0.6))
                         }
                     }
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .font(DesignSystem.bodyText)
+                    .foregroundColor(DesignSystem.pureBlack)
+                    .padding(DesignSystem.spacingL)
+                    .background(DesignSystem.pureWhite)
+                    .cornerRadius(DesignSystem.cornerRadius)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                            .stroke(DesignSystem.secondaryBlue.opacity(0.3), lineWidth: DesignSystem.borderWidth)
+                    )
                     .focused($focusedField, equals: .password)
                     .submitLabel(.done)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, DesignSystem.spacingXL)
+                
+                // Legal Agreement Checkbox (Sign Up only)
+                if mode == .signup {
+                    HStack(spacing: DesignSystem.spacingM) {
+                        Button(action: {
+                            legalAccepted.toggle()
+                        }) {
+                            Image(systemName: legalAccepted ? "checkmark.square.fill" : "square")
+                                .font(.system(size: 20))
+                                .foregroundColor(legalAccepted ? DesignSystem.primaryYellow : DesignSystem.secondaryBlue.opacity(0.6))
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 0) {
+                                Text("I agree to the ")
+                                    .font(DesignSystem.bodyTextSmall)
+                                    .foregroundColor(DesignSystem.pureBlack)
+                                
+                                Button("Beta Tester Agreement") {
+                                    legalModalType = .betaAgreement
+                                    showLegalModal = true
+                                }
+                                .font(DesignSystem.bodyTextSmall)
+                                .foregroundColor(DesignSystem.secondaryBlue)
+                                .underline()
+                            }
+                            
+                            HStack(spacing: 0) {
+                                Text("and ")
+                                    .font(DesignSystem.bodyTextSmall)
+                                    .foregroundColor(DesignSystem.pureBlack)
+                                
+                                Button("Privacy Notice") {
+                                    legalModalType = .privacyNotice
+                                    showLegalModal = true
+                                }
+                                .font(DesignSystem.bodyTextSmall)
+                                .foregroundColor(DesignSystem.secondaryBlue)
+                                .underline()
+                            }
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal, DesignSystem.spacingXL)
+                }
+                
                 // Error Message
                 if let error = authViewModel.errorMessage {
                     Text(error)
-                        .foregroundColor(.red)
+                        .font(DesignSystem.bodyTextSmall)
+                        .foregroundColor(DesignSystem.mutedRed)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                        .padding(.horizontal, DesignSystem.spacingXL)
                 }
                 // Forgot Password (Login only)
                 if mode == .login {
                     Button("Forgot password?") {
                         // TODO: Implement password reset
                     }
-                    .font(.footnote)
-                    .foregroundColor(.accentColor)
+                    .font(DesignSystem.captionText)
+                    .foregroundColor(DesignSystem.secondaryBlue)
                 }
                 // Main Action Button
                 Button(action: {
@@ -96,26 +168,37 @@ struct LoginView: View {
                     if mode == .login {
                         authViewModel.signIn(email: email, password: password)
                     } else {
-                        authViewModel.signUp(email: email, password: password)
+                        authViewModel.signUp(email: email, password: password, legalAccepted: legalAccepted)
                     }
                 }) {
                     if authViewModel.isLoading {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
+                            .progressViewStyle(CircularProgressViewStyle(tint: DesignSystem.pureBlack))
                             .frame(maxWidth: .infinity)
-                            .padding()
+                            .frame(height: DesignSystem.buttonHeight)
                     } else {
                         Text(mode == .login ? "Login" : "Sign Up")
-                            .fontWeight(.bold)
+                            .font(DesignSystem.bodyText)
+                            .fontWeight(.semibold)
+                            .foregroundColor(DesignSystem.pureBlack)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.accentColor)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .frame(height: DesignSystem.buttonHeight)
+                            .background(DesignSystem.primaryYellow)
+                            .cornerRadius(DesignSystem.cornerRadius)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DesignSystem.cornerRadius)
+                                    .stroke(DesignSystem.secondaryBlue, lineWidth: DesignSystem.borderWidth)
+                            )
+                            .shadow(
+                                color: DesignSystem.subtleShadow.color,
+                                radius: DesignSystem.subtleShadow.radius,
+                                x: DesignSystem.subtleShadow.x,
+                                y: DesignSystem.subtleShadow.y
+                            )
                     }
                 }
-                .disabled(authViewModel.isLoading)
-                .padding(.horizontal)
+                .disabled(authViewModel.isLoading || (mode == .signup && !legalAccepted))
+                .padding(.horizontal, DesignSystem.spacingXL)
                 Spacer()
             }
         }
@@ -127,10 +210,35 @@ struct LoginView: View {
                 "mode": newMode.rawValue.lowercased()
             ])
         }
+                        .sheet(isPresented: $showLegalModal) {
+                    LegalModal(
+                        title: legalModalType == .betaAgreement ? "Beta Tester Agreement (Private Evaluation)" : "Privacy Notice",
+                        content: loadLegalContent(),
+                        onAccept: {
+                            showLegalModal = false
+                        },
+                        onCancel: {
+                            showLegalModal = false
+                        },
+                        requiresAcceptance: legalModalType == .betaAgreement,
+                        onScrollComplete: nil
+                    )
+                }
     }
 
     private func hideKeyboard() {
         focusedField = nil
+    }
+    
+    private func loadLegalContent() -> String {
+        let fileName = legalModalType == .betaAgreement ? LegalConstants.betaTesterAgreementPath : "PrivacyNotice"
+        let documentName = legalModalType == .betaAgreement ? "Beta Tester Agreement" : "Privacy Notice"
+        
+        guard let path = Bundle.main.path(forResource: fileName, ofType: "md"),
+              let content = try? String(contentsOfFile: path) else {
+            return "\(documentName) content could not be loaded."
+        }
+        return content
     }
 }
 

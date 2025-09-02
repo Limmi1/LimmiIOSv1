@@ -97,6 +97,9 @@ final class BlockingEngine: ObservableObject {
     /// Strategy for rule processing (pluggable and updatable)
     private var ruleProcessingStrategy: RuleProcessingStrategy
     
+    /// Time limit checker that takes precedence over Firebase rules
+    private let timeLimitChecker = TimeLimitChecker()
+    
     // MARK: - Private Properties
     
     /// Stores Combine subscriptions for reactive data flow.
@@ -304,6 +307,14 @@ final class BlockingEngine: ObservableObject {
         evaluateBlockingRules()
         
         performanceMonitor.endOperation(.ruleEvaluation)
+    }
+    
+    /// Refreshes time limits and forces rule evaluation
+    /// This should be called when time limits are added, modified, or deleted
+    func refreshTimeLimits() {
+        logger.debug("Refreshing time limits")
+        timeLimitChecker.refreshTimeLimits()
+        forceEvaluation()
     }
     
     func refreshRules() {
@@ -602,6 +613,14 @@ final class BlockingEngine: ObservableObject {
                 self?.handleProcessedEvent(event)
             }
             .store(in: &cancellables)
+        
+        // Subscribe to time limit changes
+        timeLimitChecker.$timeLimitBlockedApps
+            .sink { [weak self] _ in
+                self?.logger.debug("Time limit blocked apps changed, forcing evaluation")
+                self?.forceEvaluation()
+            }
+            .store(in: &cancellables)
     }
     
     private func initializeMonitoring() {
@@ -824,10 +843,20 @@ final class BlockingEngine: ObservableObject {
         currentRuleResults = evaluationResult.ruleBlockingStatus
         currentDetailedResults = evaluationResult.detailedResults
         
-        // Apply blocking decisions based on the evaluation result
+        // Apply blocking decisions with time limit precedence
+        // Time limits take precedence over Firebase rules
+        let timeLimitBlockedApps = timeLimitChecker.getTimeLimitBlockedApps()
+        
         blocker.applyRuleBasedBlocking(
             for: Array(allBlockedAppIds),
-            using: { appId in evaluationResult.blockedAppIds.contains(appId) }
+            using: { appId in 
+                // Time limits take precedence - if app is blocked by time limit, block it regardless of Firebase rules
+                if timeLimitChecker.shouldBlockApp(appId) {
+                    return true
+                }
+                // Otherwise, use Firebase rule evaluation result
+                return evaluationResult.blockedAppIds.contains(appId)
+            }
         )
         
         performanceMonitor.endOperation(.ruleEvaluation)
@@ -838,7 +867,11 @@ final class BlockingEngine: ObservableObject {
         }.joined(separator: ",")
         
         let evaluationId = UUID().uuidString.suffix(8)
-        logger.debug("[\(evaluationId)] Evaluating \(rules.count) rules at location \(location.coordinate) with beacons[\(beaconRegionStatus)]: \(evaluationResult.blockedAppIds.count)/\(allBlockedAppIds.count) apps blocked")
+        let timeLimitBlockedCount = timeLimitBlockedApps.count
+        let firebaseBlockedCount = evaluationResult.blockedAppIds.count
+        let totalBlockedCount = timeLimitBlockedCount + firebaseBlockedCount
+        
+        logger.debug("[\(evaluationId)] Evaluating \(rules.count) rules at location \(location.coordinate) with beacons[\(beaconRegionStatus)]: \(totalBlockedCount) apps blocked (Time Limits: \(timeLimitBlockedCount), Firebase: \(firebaseBlockedCount))")
     }
     
     /// Determines if a specific app should be blocked based on a rule and current context.

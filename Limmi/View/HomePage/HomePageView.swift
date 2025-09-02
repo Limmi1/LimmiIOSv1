@@ -72,6 +72,7 @@ struct HomePageViewContent: View {
     @State private var ruleCreationMode: RuleCreationMode = .blocked
     @State private var showingDeleteAlert = false
     @State private var ruleToDelete: Rule?
+    @State private var showingTimeLimits = false
     
     // Explicit initializer for all properties
     init(
@@ -129,7 +130,28 @@ struct HomePageViewContent: View {
                                 Text("Create Spaces")
                                     .font(.system(size: 22, weight: .bold))
                                     .foregroundColor(DesignSystem.pureBlack)
+                                
                                 Spacer()
+                                
+                                // Time Limits Button
+                                Button(action: {
+                                    showingTimeLimits = true
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "clock.fill")
+                                            .font(.system(size: 14, weight: .medium))
+                                        Text("Time Limits")
+                                            .font(.system(size: 14, weight: .semibold))
+                                    }
+                                    .foregroundColor(DesignSystem.secondaryBlue)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(DesignSystem.secondaryBlue.opacity(0.1))
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                             
                             // Subtle divider line
@@ -286,6 +308,9 @@ struct HomePageViewContent: View {
             .background(DesignSystem.subtleYellowBackground)
                 .sheet(isPresented: $showingRuleCreation) {
                     RuleCreationFlowView(ruleCreationMode: ruleCreationMode)
+                }
+                .sheet(isPresented: $showingTimeLimits) {
+                    TimeLimitsView()
                 }
             }
             .tabItem {

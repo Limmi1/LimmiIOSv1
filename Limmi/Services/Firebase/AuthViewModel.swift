@@ -9,6 +9,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 
 /// Firebase authentication view model managing user authentication state.
 ///
@@ -103,8 +104,16 @@ class AuthViewModel: ObservableObject {
     /// - Parameters:
     ///   - email: New user's email address
     ///   - password: New user's password
-    func signUp(email: String, password: String) {
+    ///   - legalAccepted: Whether user has accepted the legal agreement
+    func signUp(email: String, password: String, legalAccepted: Bool = false) {
         clearError()
+        
+        // Guard: Check legal acceptance
+        guard legalAccepted else {
+            errorMessage = "Please agree to the Beta Tester Agreement to continue."
+            return
+        }
+        
         isLoading = true
         
         Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
@@ -114,7 +123,37 @@ class AuthViewModel: ObservableObject {
                     self?.errorMessage = error.localizedDescription
                 } else {
                     self?.user = result?.user
+                    
+                    // Store legal acceptance data
+                    if let user = result?.user {
+                        self?.storeLegalAcceptance(user: user)
+                    }
                 }
+            }
+        }
+    }
+    
+    /// Stores legal acceptance data for the user
+    private func storeLegalAcceptance(user: User) {
+        let legalData: [String: Any] = [
+            "legalAcceptedAt": ISO8601DateFormatter().string(from: Date()),
+            "legalAcceptedVersion": LegalConstants.legalVersion
+        ]
+        
+        // Local fallback
+        UserDefaults.standard.set(legalData, forKey: "legalAcceptance_\(user.uid)")
+        
+        // Persist to Firestore (server-side enforcement)
+        let db = Firestore.firestore()
+        db.collection("users").document(user.uid).setData(legalData, merge: true) { error in
+            if let error = error {
+                #if DEBUG
+                print("⚠️ Firestore legal acceptance write failed: \(error.localizedDescription)")
+                #endif
+            } else {
+                #if DEBUG
+                print("✅ Firestore legal acceptance stored for user: \(user.uid)")
+                #endif
             }
         }
     }
